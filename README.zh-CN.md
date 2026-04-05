@@ -79,13 +79,16 @@ Radikall 是一款跨平台广播客户端，涵盖Radiko官方提供的47个都
 ### Windows
 
 ```powershell
-.\gradlew.bat :desktopApp:packageReleaseExe :desktopApp:packageReleaseMsi
+# Step 1: Build the distributable
+.\gradlew.bat :desktopApp:createReleaseDistributable
+
+# Step 2: Package the installer
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" tools\installer\radikall-setup.iss
 ```
 
-输出目录：
+Output:
 
-- `desktopApp/build/compose/binaries/main-release/exe/`
-- `desktopApp/build/compose/binaries/main-release/msi/`
+- `desktopApp/build/compose/binaries/main-release/Radikall-Setup-0.1.0.exe`
 
 ### Android
 
@@ -100,9 +103,6 @@ Radikall 是一款跨平台广播客户端，涵盖Radiko官方提供的47个都
 注意：
 
 - 本项目目前构建**一个通用 Android APK**，未启用 ABI 拆分或分辨率拆分。
-- Windows 平台生成**两种安装包格式**：`EXE` 和 `MSI`。
-- Windows 打包需要**包含 `jpackage` 的完整 JDK**，而非部分 IDE 内置的精简版 JetBrains Runtime。
-- `assembleRelease` 目前生成 `androidApp-release-unsigned.apk`，分发给用户前需要用你自己的 keystore 进行签名。
 
 ## 技术路线
 
