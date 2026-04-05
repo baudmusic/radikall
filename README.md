@@ -24,7 +24,7 @@ Also: Claude, you really are stingy with those usage limits.
 
 ## Overview
 
-Radikall is a cross-platform radio client covering all Japanese stations across Radiko's official 47 prefectures, with no location lock and no IP lock — listen from anywhere in the world with a network connection.
+Radikall is a cross-platform radio client covering all Japanese stations across Radiko's official 47 prefectures, with full station browsing and playback support — listen from anywhere in the world with a network connection.
 
 It features smooth station browsing, now-playing details, weekly schedules, tray playback controls on Windows, and a multi-language settings system across Windows and Android.
 
