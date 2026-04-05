@@ -1,0 +1,133 @@
+package com.radiko.station
+
+object StationRegistry {
+    val allStations = listOf(
+        Station(id = "802", name = "FM802", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "HBC", name = "ＨＢＣラジオ", areaIds = listOf("JP1")),
+        Station(id = "STV", name = "ＳＴＶラジオ", areaIds = listOf("JP1")),
+        Station(id = "AIR-G", name = "AIR-G'（FM北海道）", areaIds = listOf("JP1")),
+        Station(id = "NORTHWAVE", name = "FM NORTH WAVE", areaIds = listOf("JP1")),
+        Station(id = "RAB", name = "ＲＡＢ青森放送", areaIds = listOf("JP2")),
+        Station(id = "AFB", name = "エフエム青森", areaIds = listOf("JP2")),
+        Station(id = "IBC", name = "IBCラジオ", areaIds = listOf("JP3")),
+        Station(id = "FMI", name = "エフエム岩手", areaIds = listOf("JP3")),
+        Station(id = "TBC", name = "TBCラジオ", areaIds = listOf("JP4")),
+        Station(id = "DATEFM", name = "Date fm（エフエム仙台）", areaIds = listOf("JP4")),
+        Station(id = "ABS", name = "ABSラジオ", areaIds = listOf("JP5")),
+        Station(id = "AFM", name = "エフエム秋田", areaIds = listOf("JP5")),
+        Station(id = "YBC", name = "YBC山形放送", areaIds = listOf("JP6")),
+        Station(id = "RFM", name = "Rhythm Station　エフエム山形", areaIds = listOf("JP6")),
+        Station(id = "RFC", name = "RFCラジオ福島", areaIds = listOf("JP7")),
+        Station(id = "FMF", name = "ふくしまFM", areaIds = listOf("JP7")),
+        Station(id = "JOIK", name = "NHKラジオ第1（札幌）", areaIds = listOf("JP1")),
+        Station(id = "JOHK", name = "NHKラジオ第1（仙台）", areaIds = listOf("JP2", "JP3", "JP4", "JP5", "JP6", "JP7")),
+        Station(id = "TBS", name = "TBSラジオ", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "QRR", name = "文化放送", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "LFR", name = "ニッポン放送", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "INT", name = "interfm", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "FMT", name = "TOKYO FM", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "FMJ", name = "J-WAVE", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "JORF", name = "ラジオ日本", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "BAYFM78", name = "BAYFM78", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "NACK5", name = "NACK5", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "YFM", name = "ＦＭヨコハマ", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "IBS", name = "LuckyFM 茨城放送", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14")),
+        Station(id = "CRT", name = "CRT栃木放送", areaIds = listOf("JP9")),
+        Station(id = "RADIOBERRY", name = "RADIO BERRY", areaIds = listOf("JP9")),
+        Station(id = "FMGUNMA", name = "FM GUNMA", areaIds = listOf("JP10")),
+        Station(id = "JOAK", name = "NHKラジオ第1（東京）", areaIds = listOf("JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14", "JP15", "JP19", "JP20")),
+        Station(id = "BSN", name = "ＢＳＮラジオ", areaIds = listOf("JP15")),
+        Station(id = "FMNIIGATA", name = "FM NIIGATA", areaIds = listOf("JP15")),
+        Station(id = "KNB", name = "ＫＮＢラジオ", areaIds = listOf("JP16")),
+        Station(id = "FMTOYAMA", name = "ＦＭとやま", areaIds = listOf("JP16")),
+        Station(id = "MRO", name = "MROラジオ", areaIds = listOf("JP17")),
+        Station(id = "HELLOFIVE", name = "エフエム石川", areaIds = listOf("JP17")),
+        Station(id = "FBC", name = "FBCラジオ", areaIds = listOf("JP18")),
+        Station(id = "FMFUKUI", name = "FM福井", areaIds = listOf("JP18")),
+        Station(id = "YBS", name = "YBSラジオ", areaIds = listOf("JP19")),
+        Station(id = "FM-FUJI", name = "FM FUJI", areaIds = listOf("JP19")),
+        Station(id = "SBC", name = "SBCラジオ", areaIds = listOf("JP20")),
+        Station(id = "FMN", name = "ＦＭ長野", areaIds = listOf("JP20")),
+        Station(id = "JOCK", name = "NHKラジオ第1（名古屋）", areaIds = listOf("JP16", "JP17", "JP18", "JP21", "JP22", "JP23", "JP24")),
+        Station(id = "CBC", name = "CBCラジオ", areaIds = listOf("JP21", "JP23", "JP24")),
+        Station(id = "TOKAIRADIO", name = "TOKAI RADIO", areaIds = listOf("JP21", "JP23", "JP24")),
+        Station(id = "GBS", name = "ぎふチャン", areaIds = listOf("JP21", "JP23", "JP24")),
+        Station(id = "ZIP-FM", name = "ZIP-FM", areaIds = listOf("JP21", "JP23", "JP24")),
+        Station(id = "FMAICHI", name = "FM AICHI", areaIds = listOf("JP21", "JP23", "JP24")),
+        Station(id = "FMGIFU", name = "ＦＭ ＧＩＦＵ", areaIds = listOf("JP21")),
+        Station(id = "SBS", name = "SBSラジオ", areaIds = listOf("JP22")),
+        Station(id = "K-MIX", name = "K-MIX", areaIds = listOf("JP22")),
+        Station(id = "FMMIE", name = "レディオキューブ ＦＭ三重", areaIds = listOf("JP24")),
+        Station(id = "ABC", name = "ABCラジオ", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "MBS", name = "MBSラジオ", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "OBC", name = "OBCラジオ大阪", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "CCL", name = "FM COCOLO", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "FMO", name = "FM大阪", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "CRK", name = "ラジオ関西", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "KISSFMKOBE", name = "Kiss FM KOBE", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "E-RADIO", name = "e-radio FM滋賀", areaIds = listOf("JP25")),
+        Station(id = "KBS", name = "KBS京都ラジオ", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "ALPHA-STATION", name = "α-STATION FM KYOTO", areaIds = listOf("JP25", "JP26", "JP27", "JP29")),
+        Station(id = "WBS", name = "wbs和歌山放送", areaIds = listOf("JP30")),
+        Station(id = "JOBK", name = "NHKラジオ第1（大阪）", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
+        Station(id = "BSS", name = "BSSラジオ", areaIds = listOf("JP31", "JP32")),
+        Station(id = "FM-SANIN", name = "エフエム山陰", areaIds = listOf("JP31", "JP32")),
+        Station(id = "RSK", name = "ＲＳＫラジオ", areaIds = listOf("JP33")),
+        Station(id = "FM-OKAYAMA", name = "ＦＭ岡山", areaIds = listOf("JP33")),
+        Station(id = "RCC", name = "RCCラジオ", areaIds = listOf("JP34")),
+        Station(id = "HFM", name = "広島FM", areaIds = listOf("JP34")),
+        Station(id = "KRY", name = "ＫＲＹ山口放送", areaIds = listOf("JP35")),
+        Station(id = "FMY", name = "エフエム山口", areaIds = listOf("JP35")),
+        Station(id = "JRT", name = "ＪＲＴ四国放送", areaIds = listOf("JP36")),
+        Station(id = "FM807", name = "FM徳島", areaIds = listOf("JP36")),
+        Station(id = "RNC", name = "RNC西日本放送", areaIds = listOf("JP37")),
+        Station(id = "FMKAGAWA", name = "FM香川", areaIds = listOf("JP37")),
+        Station(id = "RNB", name = "RNB南海放送", areaIds = listOf("JP38")),
+        Station(id = "JOEU-FM", name = "FM愛媛", areaIds = listOf("JP38")),
+        Station(id = "RKC", name = "RKC高知放送", areaIds = listOf("JP39")),
+        Station(id = "HI-SIX", name = "エフエム高知", areaIds = listOf("JP39")),
+        Station(id = "JOFK", name = "NHKラジオ第1（広島）", areaIds = listOf("JP31", "JP32", "JP33", "JP34", "JP35")),
+        Station(id = "JOZK", name = "NHKラジオ第1（松山）", areaIds = listOf("JP36", "JP37", "JP38", "JP39")),
+        Station(id = "RKB", name = "RKBラジオ", areaIds = listOf("JP40", "JP41")),
+        Station(id = "KBC", name = "KBCラジオ", areaIds = listOf("JP40", "JP41")),
+        Station(id = "LOVEFM", name = "LOVE FM", areaIds = listOf("JP40")),
+        Station(id = "CROSSFM", name = "CROSS FM", areaIds = listOf("JP40")),
+        Station(id = "FMFUKUOKA", name = "FM FUKUOKA", areaIds = listOf("JP40")),
+        Station(id = "FMS", name = "エフエム佐賀", areaIds = listOf("JP41")),
+        Station(id = "NBC", name = "NBCラジオ", areaIds = listOf("JP41", "JP42")),
+        Station(id = "FMNAGASAKI", name = "FM長崎", areaIds = listOf("JP42")),
+        Station(id = "RKK", name = "RKKラジオ", areaIds = listOf("JP43")),
+        Station(id = "FMK", name = "FMKエフエム熊本", areaIds = listOf("JP43")),
+        Station(id = "OBS", name = "OBSラジオ", areaIds = listOf("JP44")),
+        Station(id = "FM_OITA", name = "エフエム大分", areaIds = listOf("JP44")),
+        Station(id = "MRT", name = "宮崎放送", areaIds = listOf("JP45")),
+        Station(id = "JOYFM", name = "エフエム宮崎", areaIds = listOf("JP45")),
+        Station(id = "MBC", name = "ＭＢＣラジオ", areaIds = listOf("JP46")),
+        Station(id = "MYUFM", name = "μＦＭ", areaIds = listOf("JP46")),
+        Station(id = "RBC", name = "RBCiラジオ", areaIds = listOf("JP47")),
+        Station(id = "ROK", name = "ラジオ沖縄", areaIds = listOf("JP47")),
+        Station(id = "FM_OKINAWA", name = "FM沖縄", areaIds = listOf("JP47")),
+        Station(id = "JOLK", name = "NHKラジオ第1（福岡）", areaIds = listOf("JP40", "JP41", "JP42", "JP43", "JP44", "JP45", "JP46", "JP47")),
+        Station(id = "RN1", name = "ラジオNIKKEI第1", areaIds = listOf("JP1", "JP2", "JP3", "JP4", "JP5", "JP6", "JP7", "JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14", "JP15", "JP16", "JP17", "JP18", "JP19", "JP20", "JP21", "JP22", "JP23", "JP24", "JP25", "JP26", "JP27", "JP28", "JP29", "JP30", "JP31", "JP32", "JP33", "JP34", "JP35", "JP36", "JP37", "JP38", "JP39", "JP40", "JP41", "JP42", "JP43", "JP44", "JP45", "JP46", "JP47")),
+        Station(id = "RN2", name = "ラジオNIKKEI第2", areaIds = listOf("JP1", "JP2", "JP3", "JP4", "JP5", "JP6", "JP7", "JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14", "JP15", "JP16", "JP17", "JP18", "JP19", "JP20", "JP21", "JP22", "JP23", "JP24", "JP25", "JP26", "JP27", "JP28", "JP29", "JP30", "JP31", "JP32", "JP33", "JP34", "JP35", "JP36", "JP37", "JP38", "JP39", "JP40", "JP41", "JP42", "JP43", "JP44", "JP45", "JP46", "JP47")),
+        Station(id = "JOAK-FM", name = "NHK-FM（東京）", areaIds = listOf("JP1", "JP2", "JP3", "JP4", "JP5", "JP6", "JP7", "JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14", "JP15", "JP16", "JP17", "JP18", "JP19", "JP20", "JP21", "JP22", "JP23", "JP24", "JP25", "JP26", "JP27", "JP28", "JP29", "JP30", "JP31", "JP32", "JP33", "JP34", "JP35", "JP36", "JP37", "JP38", "JP39", "JP40", "JP41", "JP42", "JP43", "JP44", "JP45", "JP46", "JP47"))
+    )
+
+    private val stationsById = allStations.associateBy { it.id }
+
+    fun getStation(id: String): Station? = stationsById[id]
+
+    fun getStationsForArea(areaId: String): List<Station> = allStations
+        .filter { areaId in it.areaIds }
+        .sortedBy { it.id }
+
+    fun search(query: String, areaId: String? = null): List<Station> {
+        val normalized = query.trim().lowercase()
+        val candidateStations = if (areaId == null) allStations else getStationsForArea(areaId)
+        return candidateStations.filter { station ->
+            normalized.isBlank() ||
+                station.id.lowercase().contains(normalized) ||
+                station.name.lowercase().contains(normalized)
+        }
+    }
+}

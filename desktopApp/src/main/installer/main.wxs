@@ -1,0 +1,5 @@
+<UI>
+     <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+     <WixVariable Id="WixUIDialogBmp" Value="wix-dialog.bmp" />
+     <WixVariable Id="WixUIBannerBmp" Value="wix-banner.bmp" />
+</UI>
