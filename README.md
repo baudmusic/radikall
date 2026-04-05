@@ -79,13 +79,16 @@ Then run:
 ### Windows
 
 ```powershell
-.\gradlew.bat :desktopApp:packageReleaseExe :desktopApp:packageReleaseMsi
+# Step 1: Build the distributable
+.\gradlew.bat :desktopApp:createReleaseDistributable
+
+# Step 2: Package the installer
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" tools\installer\radikall-setup.iss
 ```
 
-Outputs:
+Output:
 
-- `desktopApp/build/compose/binaries/main-release/exe/`
-- `desktopApp/build/compose/binaries/main-release/msi/`
+- `desktopApp/build/compose/binaries/main-release/Radikall-Setup-0.1.0.exe`
 
 ### Android
 
@@ -101,9 +104,6 @@ Note:
 
 - This project currently builds **one universal Android APK**.
 - It does **not** enable ABI splits or density splits, so you do not get many APKs.
-- On Windows, the project produces **two installer formats**: `EXE` and `MSI`.
-- Windows packaging needs a **full JDK with `jpackage`**, not the stripped JetBrains Runtime bundled with some IDEs.
-- `assembleRelease` currently produces `androidApp-release-unsigned.apk`, so you need to sign it with your own keystore before distributing it to users.
 
 ## Technical Route
 
