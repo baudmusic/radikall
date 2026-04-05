@@ -79,13 +79,16 @@ Radikall は、Radiko の公式 47 都道府県のすべての日本の放送局
 ### Windows
 
 ```powershell
-.\gradlew.bat :desktopApp:packageReleaseExe :desktopApp:packageReleaseMsi
+# Step 1: Build the distributable
+.\gradlew.bat :desktopApp:createReleaseDistributable
+
+# Step 2: Package the installer
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" tools\installer\radikall-setup.iss
 ```
 
-出力先：
+Output:
 
-- `desktopApp/build/compose/binaries/main-release/exe/`
-- `desktopApp/build/compose/binaries/main-release/msi/`
+- `desktopApp/build/compose/binaries/main-release/Radikall-Setup-0.1.0.exe`
 
 ### Android
 
@@ -100,9 +103,6 @@ Radikall は、Radiko の公式 47 都道府県のすべての日本の放送局
 注意：
 
 - このプロジェクトは現在、**1 つのユニバーサル Android APK** をビルドします。ABI 分割や密度分割は有効にしていません。
-- Windows では **2 種類のインストーラー形式**（`EXE` と `MSI`）が生成されます。
-- Windows パッケージングには **`jpackage` を含む完全な JDK** が必要です。一部の IDE にバンドルされた簡易版 JetBrains Runtime では動作しません。
-- `assembleRelease` は現在 `androidApp-release-unsigned.apk` を生成します。ユーザーに配布する前に、自分のキーストアで署名する必要があります。
 
 ## 技術スタック
 
