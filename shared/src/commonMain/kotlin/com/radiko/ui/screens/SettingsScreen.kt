@@ -65,6 +65,13 @@ import com.radiko.ui.theme.radikoSecondaryTextColor
 import com.radiko.ui.viewmodel.RadikoAppGraph
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
+import com.radiko.platform.openUrl
+import androidx.compose.foundation.Image
+import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextDecoration
+import radiko_app.shared.generated.resources.Res
+import radiko_app.shared.generated.resources.logo
 
 private data class DropdownOption<T>(
     val label: String,
@@ -433,10 +440,102 @@ fun SettingsScreen(
                         )
                     }
                 }
-                SettingsNote(
-                    title = strings.aboutTitle,
-                    body = strings.aboutBody(PlatformRuntimeInfo.versionName),
+
+                 Surface(
+    shape = RoundedCornerShape(24.dp),
+    color = MaterialTheme.colorScheme.surface,
+    border = BorderStroke(1.dp, radikoPanelBorderColor()),
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = strings.aboutTitle,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = radikoPrimaryTextColor(),
                 )
+                Text(
+                    text = strings.aboutBody(PlatformRuntimeInfo.versionName),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = radikoSecondaryTextColor(),
+                )
+            }
+            Image(
+                painter = painterResource(Res.drawable.logo),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .width(72.dp),
+            )
+        }
+
+        // 完全开源免费
+        AboutBlock(
+            label = strings.aboutOpenSourceLabel,
+            body = strings.aboutOpenSourceBody,
+            labelColor = RadikoColors.AccentRed,
+        )
+
+        // 原始仓库（可点击）
+        AboutLinkRow(
+            label = strings.aboutRepoLabel,
+            url = strings.aboutRepoUrl,
+        )
+
+        // 检查更新（可点击）
+        AboutLinkRow(
+            label = strings.aboutCheckUpdate,
+            url = strings.aboutCheckUpdateUrl,
+        )
+
+        // 关注开发者（可点击）
+        AboutBlock(
+            label = strings.aboutSiteLabel,
+            body = strings.aboutSiteBody,
+        )
+        AboutLinkRow(
+            label = "baudstudio.com",
+            url = strings.aboutSiteUrl,
+        )
+
+        // 致谢
+        AboutBlock(
+            label = strings.aboutCreditsLabel,
+            body = strings.aboutCreditsBody,
+        )
+        AboutLinkRow(
+            label = "jackyzy823/rajiko",
+            url = strings.aboutCreditsUrl,
+        )
+
+        // 字体授权
+        Text(
+            text = strings.aboutFontNotice,
+            style = MaterialTheme.typography.bodySmall,
+            color = radikoSecondaryTextColor(),
+        )
+
+        // 免责声明
+        AboutBlock(
+            label = strings.aboutDisclaimerLabel,
+            body = strings.aboutDisclaimerBody,
+            labelColor = RadikoColors.PrimaryBlue,
+        )
+    }
+}
             }
         }
     }
@@ -710,4 +809,42 @@ private fun SettingsNote(
             )
         }
     }
+}
+@Composable
+private fun AboutBlock(
+    label: String,
+    body: String,
+    labelColor: Color = radikoPrimaryTextColor(),
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleSmall,
+            color = labelColor,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = body,
+            style = MaterialTheme.typography.bodySmall,
+            color = radikoSecondaryTextColor(),
+        )
+    }
+}
+
+@Composable
+private fun AboutLinkRow(
+    label: String,
+    url: String,
+) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.bodySmall.copy(
+            textDecoration = TextDecoration.Underline,
+        ),
+        color = RadikoColors.PrimaryBlue,
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+        ) { openUrl(url) },
+    )
 }

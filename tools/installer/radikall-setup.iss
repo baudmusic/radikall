@@ -1,10 +1,10 @@
-; ============================================================
-;  Radikall — Inno Setup 安装脚本
-;  支持: English / 简体中文 / 繁體中文 / 日本語 / 한국어
+﻿; ============================================================
+;  Radikall 鈥?Inno Setup 瀹夎鑴氭湰
+;  鏀寔: English / 绠€浣撲腑鏂?/ 绻侀珨涓枃 / 鏃ユ湰瑾?/ 頃滉淡鞏?
 ; ============================================================
 
 #define AppName "Radikall"
-#define AppVersion "0.1.0"
+#define AppVersion "1.0.0"
 #define AppPublisher "baudstudio.com"
 #define AppURL "https://baudstudio.com"
 #define AppExeName "Radikall.exe"
@@ -38,22 +38,15 @@ Name: "zhtw"; MessagesFile: "compiler:Languages\ChineseTraditional.isl"
 Name: "ja";   MessagesFile: "compiler:Languages\Japanese.isl"
 Name: "ko";   MessagesFile: "compiler:Languages\Korean.isl"
 
-[CustomMessages]
-en.VlcWarning=VLC media player is required for audio playback.%nPlease install VLC before launching Radikall.
-zhcn.VlcWarning=音频播放需要 VLC 媒体播放器。%n请在启动 Radikall 前先安装 VLC。
-zhtw.VlcWarning=音訊播放需要 VLC 媒體播放器。%n請在啟動 Radikall 前先安裝 VLC。
-ja.VlcWarning=音声再生には VLC メディアプレーヤーが必要です。%nRadikall を起動する前に VLC をインストールしてください。
-ko.VlcWarning=오디오 재생을 위해 VLC 미디어 플레이어가 필요합니다.%nRadikall 실행 전에 VLC를 먼저 설치해 주세요。
-
 [Files]
 Source: "{#SourceDir}\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#SourceDir}\app\*";         DestDir: "{app}\app";     Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#SourceDir}\runtime\*";     DestDir: "{app}\runtime"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-; 开始菜单
+; 寮€濮嬭彍鍗?
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
-; 桌面快捷方式
+; 妗岄潰蹇嵎鏂瑰紡
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 
 [Run]
@@ -62,8 +55,22 @@ Filename: "{app}\{#AppExeName}"; \
     Flags: nowait postinstall skipifsilent
 
 [Code]
+function IsVLCInstalled(): Boolean;
+begin
+  Result := RegKeyExists(HKLM, 'SOFTWARE\VideoLAN\VLC') or
+            RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\VideoLAN\VLC');
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ErrorCode: Integer;
 begin
   if CurStep = ssPostInstall then
-    MsgBox(CustomMessage('VlcWarning'), mbInformation, MB_OK);
+  begin
+    if not IsVLCInstalled() then
+    begin
+      MsgBox(CustomMessage('VlcWarning'), mbInformation, MB_OK);
+      ShellExec('open', 'https://get.videolan.org/vlc/last/win64/', '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+    end;
+  end;
 end;

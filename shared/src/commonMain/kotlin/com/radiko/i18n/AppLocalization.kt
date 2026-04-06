@@ -442,13 +442,73 @@ class AppStrings internal constructor(
         AppLanguage.ENGLISH -> "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
     }
 
+
     fun aboutBody(version: String): String = when (language) {
-        AppLanguage.SIMPLIFIED_CHINESE -> "版本 $version。界面使用 Noto Sans JP 字体，遵循 SIL Open Font License 1.1（OFL）授权。"
-        AppLanguage.TRADITIONAL_CHINESE -> "版本 $version。介面使用 Noto Sans JP 字體，遵循 SIL Open Font License 1.1（OFL）授權。"
-        AppLanguage.ENGLISH -> "Version $version. The interface uses the Noto Sans JP font under the SIL Open Font License 1.1 (OFL)."
-        AppLanguage.JAPANESE -> "バージョン $version。UI には Noto Sans JP フォントを使用しており、SIL Open Font License 1.1（OFL）に従います。"
-        AppLanguage.KOREAN -> "버전 $version. 인터페이스에는 SIL Open Font License 1.1(OFL)을 따르는 Noto Sans JP 글꼴을 사용합니다."
+        AppLanguage.SIMPLIFIED_CHINESE -> "版本 $version"
+        AppLanguage.TRADITIONAL_CHINESE -> "版本 $version"
+        AppLanguage.ENGLISH -> "Version $version"
+        AppLanguage.JAPANESE -> "バージョン $version"
+        AppLanguage.KOREAN -> "버전 $version"
     }
+
+
+     val aboutOpenSourceLabel: String get() = text(
+        "完全开源免费",
+        "完全開源免費",
+        "Free and Open Source",
+        "完全無料・オープンソース",
+        "완전 무료 오픈소스",
+    )
+val aboutOpenSourceBody: String get() = text(
+    "Radikall 完全开源且永久免费。任何以此应用收费的行为均为欺诈，请认准原仓库。",
+    "Radikall 完全開源且永久免費。任何以此應用收費的行為均為欺詐，請認準原倉庫。",
+    "Radikall is completely free and open source. Any paid version of this app is fraudulent. Always download from the official repository.",
+    "Radikall は完全無料かつオープンソースです。有料で販売されているものはすべて偽物です。必ず公式リポジトリからダウンロードしてください。",
+    "Radikall은 완전히 무료이며 오픈소스입니다. 유료로 판매되는 버전은 모두 사기입니다. 반드시 공식 저장소에서 다운로드하세요.",
+)
+val aboutRepoLabel: String get() = text("原始仓库", "原始倉庫", "Source Repository", "ソースリポジトリ", "소스 저장소")
+val aboutRepoUrl: String get() = "https://github.com/baudmusic/radikall"
+val aboutSiteLabel: String get() = text(
+    "关注开发者",
+    "關注開發者",
+    "Follow the Developer",
+    "開発者をフォロー",
+    "개발자 팔로우",
+)
+val aboutSiteBody: String get() = text(
+    "如果你喜欢这个应用，欢迎访问 baudstudio.com 并关注我的社交账号。我的本职是一名 Acapella 博主，谢谢你的支持。",
+    "如果你喜歡這個應用，歡迎訪問 baudstudio.com 並關注我的社交帳號。我的本職是一名 Acapella 博主，謝謝你的支持。",
+    "If you enjoy this app, please visit baudstudio.com and follow my social accounts. I'm primarily an Acapella content creator. Thank you for your support.",
+    "このアプリが気に入ったら、baudstudio.com にアクセスして SNS をフォローしてください。本業はアカペラ系クリエイターです。応援ありがとうございます。",
+    "이 앱이 마음에 드셨다면 baudstudio.com을 방문하고 SNS를 팔로우해 주세요. 본업은 아카펠라 크리에이터입니다. 응원해 주셔서 감사합니다.",
+)
+val aboutSiteUrl: String get() = "https://baudstudio.com"
+val aboutCheckUpdate: String get() = text("检查更新", "檢查更新", "Check for Updates", "アップデートを確認", "업데이트 확인")
+val aboutCheckUpdateUrl: String get() = "https://github.com/baudmusic/radikall/releases/latest"
+val aboutFontNotice: String get() = text(
+    "界面使用 Noto Sans JP 字体，遵循 SIL Open Font License 1.1（OFL）授权。",
+    "介面使用 Noto Sans JP 字體，遵循 SIL Open Font License 1.1（OFL）授權。",
+    "The interface uses the Noto Sans JP font under the SIL Open Font License 1.1 (OFL).",
+    "UI には Noto Sans JP フォントを使用しており、SIL Open Font License 1.1（OFL）に従います。",
+    "인터페이스에는 SIL Open Font License 1.1(OFL)을 따르는 Noto Sans JP 글꼴을 사용합니다.",
+)
+val aboutDisclaimerLabel: String get() = text("免责声明", "免責聲明", "Disclaimer", "免責事項", "면책 조항")
+val aboutDisclaimerBody: String get() = text(
+    "Radikall 是非官方第三方客户端，与 Radiko Co., Ltd. 及其广播合作伙伴无任何关联。本应用仅供个人学习与技术研究使用，不得用于商业目的。使用者须自行承担相关法律责任。",
+    "Radikall 是非官方第三方客戶端，與 Radiko Co., Ltd. 及其廣播合作夥伴無任何關聯。本應用僅供個人學習與技術研究使用，不得用於商業目的。使用者須自行承擔相關法律責任。",
+    "Radikall is an unofficial third-party client, unaffiliated with Radiko Co., Ltd. or its broadcasting partners. For personal and educational use only. Commercial use is not permitted. Users assume all legal responsibility.",
+    "Radikall は非公式のサードパーティクライアントであり、Radiko Co., Ltd. およびその放送パートナーとは一切関係ありません。個人利用および技術研究目的のみ。商用利用は禁止です。利用者は一切の法的責任を負います。",
+    "Radikall은 비공식 서드파티 클라이언트이며 Radiko Co., Ltd. 및 방송 파트너와 무관합니다. 개인 학습 및 기술 연구 목적으로만 사용 가능합니다. 상업적 사용은 금지됩니다. 이용자는 모든 법적 책임을 집니다.",
+)
+val aboutCreditsLabel: String get() = text("致谢", "致謝", "Credits", "クレジット", "크레딧")
+val aboutCreditsBody: String get() = text(
+    "本项目得益于 jackyzy823/rajiko 项目的思路与逆向工程工作。",
+    "本專案得益於 jackyzy823/rajiko 專案的思路與逆向工程工作。",
+    "This project builds on the ideas and reverse-engineering work of jackyzy823/rajiko.",
+    "このプロジェクトは jackyzy823/rajiko の取り組みとリバースエンジニアリングの成果に基づいています。",
+    "이 프로젝트는 jackyzy823/rajiko의 아이디어와 리버스 엔지니어링 작업을 기반으로 합니다.",
+)
+val aboutCreditsUrl: String get() = "https://github.com/jackyzy823/rajiko"
 
     fun cacheClearMessage(cleared: Boolean): String = when {
         cleared -> text(
