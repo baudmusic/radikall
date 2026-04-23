@@ -57,12 +57,23 @@ Recommended environment:
 - Android 7.0 or newer
 - Stable Wi-Fi or mobile network
 
+### iOS
+
+1. Open [https://radikall-web.baudmusic.workers.dev](https://radikall-web.baudmusic.workers.dev) in Safari.
+2. Save it to the Home Screen / desktop, then launch it from there.
+
+### macOS
+
+1. Open [https://radikall-web.baudmusic.workers.dev](https://radikall-web.baudmusic.workers.dev) in Safari.
+2. Save it to the desktop, then launch it from there.
+
 ### Build From Source
 
 If you want to build the project yourself, install these first:
 
 - Git
 - A full JDK 24 installation
+- Node.js LTS and npm
 - Android Studio with Android SDK 35
 - Platform Tools / `adb`
 - VLC media player on Windows for desktop playback testing
@@ -72,6 +83,17 @@ Then run:
 ```powershell
 .\gradlew.bat :desktopApp:run
 .\gradlew.bat :androidApp:installDebug
+```
+
+### Web App Source Deployment
+
+```bash
+cd webApp
+npm install
+npm run build:cloudflare
+npx wrangler login
+npx wrangler secret put RADIKALL_SESSION_SECRET
+npm run deploy:cloudflare
 ```
 
 ## Release Build
@@ -191,37 +213,3 @@ This project is intended solely for personal use and educational / technical res
 This software accesses data through publicly observable network interfaces. Users are solely responsible for ensuring their usage complies with the laws, regulations, and terms of service applicable in their jurisdiction.
 
 By using this software, you acknowledge that you do so at your own risk and that the developer(s) of this project assume no liability for any legal, technical, or other consequences arising from its use.
-
-## Web App (Free Cloudflare Route)
-
-The PWA / Home Screen Web App can now be deployed on Cloudflare Workers without paying for a separate always-on server.
-
-- Public URL: [https://radikall-web.baudmusic.workers.dev](https://radikall-web.baudmusic.workers.dev)
-- Public entry: a stable `workers.dev` URL
-- Primary target: iPhone Safari + Home Screen Web App
-- API + static files: served by the same Worker
-- Playback: HLS-first route, no `ffmpeg` / `audio.mp3` fallback in the free production path
-
-Quick start:
-
-```bash
-cd webApp
-npm install
-npm run build:cloudflare
-npx wrangler login
-npx wrangler secret put RADIKALL_SESSION_SECRET
-npm run deploy:cloudflare
-```
-
-Deployment details:
-
-- Worker config: [wrangler.jsonc](E:/YLY/RADIKO/radiko-app/wrangler.jsonc)
-- Worker entry: [index.ts](E:/YLY/RADIKO/radiko-app/webApp/worker/src/index.ts)
-- Static data generator: [generate-worker-data.mjs](E:/YLY/RADIKO/radiko-app/webApp/scripts/generate-worker-data.mjs)
-- Full deployment guide: [cloudflare-workers-free-deploy.md](E:/YLY/RADIKO/radiko-app/docs/cloudflare-workers-free-deploy.md)
-
-User distribution guidance:
-
-- Give users [https://radikall-web.baudmusic.workers.dev](https://radikall-web.baudmusic.workers.dev) directly
-- iPhone / iPad users should open it in Safari and add it to the Home Screen
-- GitHub Releases should remain a changelog / backup entry, not the main Web install path
