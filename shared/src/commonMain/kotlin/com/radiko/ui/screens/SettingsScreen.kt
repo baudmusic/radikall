@@ -48,6 +48,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import com.radiko.i18n.appStrings
 import com.radiko.platform.PlatformEnvironment
+import com.radiko.platform.PlatformType
 import com.radiko.platform.PlatformRuntimeInfo
 import com.radiko.settings.AppLanguage
 import com.radiko.settings.AppThemeMode
@@ -324,7 +325,7 @@ fun SettingsScreen(
                         onSelect = settingsRepository::updateAlarmStation,
                     )
 
-                    if (PlatformEnvironment.platformType == com.radiko.platform.PlatformType.DESKTOP) {
+                    if (PlatformEnvironment.platformType == PlatformType.DESKTOP) {
                         SettingsNote(
                             title = strings.alarmClockTitle,
                             body = strings.alarmDesktopHint,
@@ -383,7 +384,7 @@ fun SettingsScreen(
                 )
             }
 
-            if (PlatformEnvironment.platformType == com.radiko.platform.PlatformType.DESKTOP) {
+            if (PlatformEnvironment.platformType == PlatformType.DESKTOP) {
                 SettingsSectionCard(
                     title = strings.desktopSectionTitle,
                     description = strings.desktopSectionDescription,

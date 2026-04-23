@@ -19,4 +19,4 @@ rootProject.name = "radiko-app"
 include(":shared")
 include(":androidApp")
 include(":desktopApp")
-
+include(":webProxy")

@@ -1,0 +1,30 @@
+{
+  "name": "radikall-webapp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "generate:worker-data": "node ./scripts/generate-worker-data.mjs",
+    "typecheck:worker": "tsc -p tsconfig.worker.json",
+    "build:cloudflare": "npm run generate:worker-data && npm run build && npm run typecheck:worker",
+    "dev:cloudflare": "wrangler dev --config ../wrangler.jsonc",
+    "deploy:cloudflare": "wrangler deploy --config ../wrangler.jsonc"
+  },
+  "dependencies": {
+    "hls.js": "^1.5.18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-pwa": "^0.20.5",
+    "wrangler": "^4.84.1"
+  }
+}

@@ -38,7 +38,7 @@ compose.desktop {
                 org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
             )
             packageName = "Radikall"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
             windows {
                 iconFile.set(project.file("src/main/resources/logo2.ico"))
                 shortcut = true

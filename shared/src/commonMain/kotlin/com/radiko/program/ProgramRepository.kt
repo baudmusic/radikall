@@ -31,7 +31,7 @@ class ProgramRepository(
             .get("https://api.radiko.jp/program/v3/weekly/$stationId.xml")
             .bodyAsText()
 
-        val programRegex = Regex("""<prog\b([^>]*)>(.*?)</prog>""", setOf(RegexOption.DOT_MATCHES_ALL))
+        val programRegex = Regex("""<prog\b([^>]*)>([\s\S]*?)</prog>""")
         return programRegex.findAll(xml).mapNotNull { match ->
             val attributes = parseAttributes(match.groupValues[1])
             val payload = match.groupValues[2]
@@ -120,7 +120,7 @@ class ProgramRepository(
     }
 
     private fun extractTag(payload: String, tag: String): String? {
-        val regex = Regex("""<$tag>(.*?)</$tag>""", setOf(RegexOption.DOT_MATCHES_ALL))
+        val regex = Regex("""<$tag>([\s\S]*?)</$tag>""")
         return regex.find(payload)?.groupValues?.get(1)?.trim()
     }
 

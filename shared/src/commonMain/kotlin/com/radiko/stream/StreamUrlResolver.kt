@@ -97,8 +97,7 @@ class StreamUrlResolver(
             .bodyAsText()
 
         val regex = Regex(
-            """<url[^>]*areafree="${if (areaFree) 1 else 0}"[^>]*timefree="${if (timeFree) 1 else 0}"[^>]*>.*?<playlist_create_url>(.*?)</playlist_create_url>""",
-            setOf(RegexOption.DOT_MATCHES_ALL),
+            """<url[^>]*areafree="${if (areaFree) 1 else 0}"[^>]*timefree="${if (timeFree) 1 else 0}"[^>]*>[\s\S]*?<playlist_create_url>(.*?)</playlist_create_url>""",
         )
         return regex.find(xml)?.groupValues?.get(1)?.trim() ?: fallbackUrl
     }

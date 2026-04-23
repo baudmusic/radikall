@@ -549,6 +549,7 @@ val aboutCreditsUrl: String get() = "https://github.com/jackyzy823/rajiko"
         DayOfWeek.FRIDAY -> text("周五", "週五", "Fri", "金", "금")
         DayOfWeek.SATURDAY -> text("周六", "週六", "Sat", "土", "토")
         DayOfWeek.SUNDAY -> text("周日", "週日", "Sun", "日", "일")
+        else -> dayOfWeek.name.take(3)
     }
 
     private fun text(

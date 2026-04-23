@@ -1,5 +1,7 @@
 package com.radiko.device
 
+import kotlin.math.pow
+import kotlin.math.round
 import kotlin.random.Random
 
 object GpsSpoofing {
@@ -72,6 +74,18 @@ object GpsSpoofing {
         val (baseLat, baseLng) = coordinates.getValue(prefecture)
         val lat = baseLat + random.nextDouble() / 40.0 * if (random.nextBoolean()) 1 else -1
         val lng = baseLng + random.nextDouble() / 40.0 * if (random.nextBoolean()) 1 else -1
-        return "%.6f,%.6f,gps".format(lat, lng)
+        return "${lat.toFixed(6)},${lng.toFixed(6)},gps"
     }
+}
+
+private fun Double.toFixed(decimals: Int): String {
+    val factor = 10.0.pow(decimals)
+    val rounded = round(this * factor) / factor
+    val text = rounded.toString()
+    val parts = text.split('.')
+    if (parts.size == 1) {
+        return text + "." + "0".repeat(decimals)
+    }
+    val fraction = parts[1].padEnd(decimals, '0')
+    return parts[0] + "." + fraction.take(decimals)
 }

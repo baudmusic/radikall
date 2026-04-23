@@ -4,7 +4,7 @@
 ; ============================================================
 
 #define AppName "Radikall"
-#define AppVersion "1.0.0"
+#define AppVersion "1.0.1"
 #define AppPublisher "baudstudio.com"
 #define AppURL "https://baudstudio.com"
 #define AppExeName "Radikall.exe"

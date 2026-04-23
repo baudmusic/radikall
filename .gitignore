@@ -7,4 +7,14 @@ build/
 *.iml
 *.jks
 *.keystore
+node_modules/
+dist/
+webApp/node_modules/
+webApp/dist/
 local.properties
+**/xcuserdata/
+**/*.xcuserstate
+DerivedData/
+.DS_Store
+.dev.vars
+.wrangler/
