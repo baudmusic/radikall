@@ -22,6 +22,10 @@ I built this app primarily so I could listen to Tatsuro Yamashita's Rakuten Card
 
 Also: Claude, you really are stingy with those usage limits.
 
+### 2026.11.15 Update
+
+It's only 1.0.0 to 1.0.1 on paper, but this is a genuinely huge update. From the UI all the way down to low-level networking bugs, we gave almost everything a fresh coat of paint. No, scratch that: we tore it down to the studs and rebuilt it. Winter is here. Have you figured out how you're spending Christmas and New Year's yet?
+
 ## Overview
 
 Radikall is a cross-platform radio client covering all Japanese stations across Radiko's official 47 prefectures, with full station browsing and playback support — listen from anywhere in the world with a network connection.

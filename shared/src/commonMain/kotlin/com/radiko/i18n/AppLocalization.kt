@@ -5,6 +5,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.radiko.settings.AppLanguage
+import com.radiko.station.ALL_AREAS_ID
+import com.radiko.station.PrefectureData
+import com.radiko.station.StationCoverage
+import com.radiko.station.StationSection
+import com.radiko.station.StationSectionKind
 import kotlinx.datetime.DayOfWeek
 
 object AppLocalizer {
@@ -68,6 +73,8 @@ private data class LocalizedText(
         AppLanguage.JAPANESE -> japanese
         AppLanguage.KOREAN -> korean
     }
+
+    fun allValues(): List<String> = listOf(simplifiedChinese, traditionalChinese, english, japanese, korean)
 }
 
 class AppStrings internal constructor(
@@ -146,10 +153,39 @@ class AppStrings internal constructor(
         "캐시 정리, 버전, 오픈소스 고지입니다.",
     )
 
-    val searchStationsPlaceholder: String get() = text("搜索电台...", "搜尋電台...", "Search stations...", "放送局を検索...", "방송국 검색...")
+    val searchStationsPlaceholder: String get() = text(
+        "搜索电台、台号或地区...",
+        "搜尋電台、台號或地區...",
+        "Search stations, IDs or areas...",
+        "放送局・局ID・地域で検索...",
+        "방송국, 코드 또는 지역 검색...",
+    )
+    val allAreas: String get() = text("全国", "全國", "All Japan", "全国", "전국")
+    val nationwideSection: String get() = text("全国播出", "全國播出", "Nationwide", "全国放送", "전국 방송")
+    val otherAreasSection: String get() = text("其他地区", "其他地區", "Other areas", "他の地域", "다른 지역")
+    val serviceAreasLabel: String get() = text("可收听地区", "可收聽地區", "Available in", "聴取可能エリア", "청취 가능 지역")
+
+    /** 卡片上的「播到几点」：[endAt] 是东京时间 yyyyMMddHHmmss。 */
+    fun untilTime(endAt: String): String {
+        val time = if (endAt.length >= 12) "${endAt.substring(8, 10)}:${endAt.substring(10, 12)}" else endAt
+        return text("～$time", "～$time", "until $time", "〜$time", "~$time")
+    }
     val noStationsFound: String get() = text("没有找到电台", "沒有找到電台", "No stations found", "放送局が見つかりません", "방송국을 찾을 수 없습니다")
     val mobileDataPromptTitle: String get() = text("使用移动网络播放？", "使用行動網路播放？", "Play on mobile data?", "モバイル回線で再生しますか？", "모바일 데이터로 재생할까요?")
     val continuePlayback: String get() = text("继续播放", "繼續播放", "Continue", "再生を続ける", "계속 재생")
+    val updateAvailableTitle: String get() = text("发现新版本", "發現新版本", "New version", "新しいバージョン", "새 버전")
+    fun updateCurrentVersion(version: String): String =
+        text("当前 $version", "目前 $version", "Current $version", "現在 $version", "현재 $version")
+    val updateWhatsNew: String get() = text("更新内容", "更新內容", "What's new", "更新内容", "업데이트 내용")
+    val updateDownload: String get() = text("下载更新", "下載更新", "Download", "ダウンロード", "다운로드")
+    val updateLater: String get() = text("暂不更新", "暫不更新", "Not now", "あとで", "나중에")
+    val updateReleaseNotesLink: String get() = text(
+        "查看更新说明",
+        "查看更新說明",
+        "Read the release notes",
+        "リリースノートを見る",
+        "릴리스 노트 보기",
+    )
     val cancel: String get() = text("取消", "取消", "Cancel", "キャンセル", "취소")
     val wifiOnlyPlaybackError: String get() = text(
         "当前设置为仅限 Wi-Fi 播放，请连接 Wi-Fi 后再试。",
@@ -164,6 +200,13 @@ class AppStrings internal constructor(
         "Unable to start playback",
         "再生を開始できません",
         "재생을 시작할 수 없습니다",
+    )
+    val playbackConnectionLost: String get() = text(
+        "网络连接中断，已停止播放",
+        "網路連線中斷，已停止播放",
+        "Connection lost. Playback stopped.",
+        "接続が切れたため再生を停止しました",
+        "연결이 끊겨 재생을 중지했습니다",
     )
     val unknownStationFallback: String get() = text("未知电台", "未知電台", "Unknown station", "不明な放送局", "알 수 없는 방송국")
 
@@ -541,6 +584,31 @@ val aboutCreditsUrl: String get() = "https://github.com/jackyzy823/rajiko"
     fun prefectureName(areaId: String, fallback: String): String =
         prefectureTranslations[areaId]?.value(language) ?: fallback
 
+    /** 地区选择器里显示的名字；[ALL_AREAS_ID] 显示为「全国」。 */
+    fun areaLabel(areaId: String): String = if (areaId == ALL_AREAS_ID) {
+        allAreas
+    } else {
+        prefectureName(areaId, PrefectureData.prefecture(areaId)?.name ?: areaId)
+    }
+
+    fun coverageLabel(coverage: StationCoverage): String = when (coverage) {
+        StationCoverage.Nationwide -> allAreas
+        is StationCoverage.Prefecture -> areaLabel(coverage.areaId)
+        is StationCoverage.Region -> regionName(
+            coverage.regionId,
+            PrefectureData.regions.find { it.id == coverage.regionId }?.name ?: coverage.regionId,
+        )
+    }
+
+    /** 首页分组标题；普通单地区列表没有标题，返回 null。 */
+    fun stationSectionTitle(section: StationSection): String? = when (section.kind) {
+        StationSectionKind.AREA -> null
+        StationSectionKind.CURRENT_AREA -> areaLabel(section.groupId.orEmpty())
+        StationSectionKind.OTHER_AREAS -> otherAreasSection
+        StationSectionKind.NATIONWIDE -> nationwideSection
+        StationSectionKind.REGION -> coverageLabel(StationCoverage.Region(section.groupId.orEmpty()))
+    }
+
     fun weekdayShort(dayOfWeek: DayOfWeek): String = when (dayOfWeek) {
         DayOfWeek.MONDAY -> text("周一", "週一", "Mon", "月", "월")
         DayOfWeek.TUESDAY -> text("周二", "週二", "Tue", "火", "화")
@@ -567,6 +635,15 @@ val aboutCreditsUrl: String get() = "https://github.com/jackyzy823/rajiko"
     ).value(language)
 }
 
+/** 都道府县在全部 5 种语言里的名字，供电台搜索匹配。 */
+internal fun prefectureNamesInAllLanguages(areaId: String): List<String> =
+    prefectureTranslations[areaId]?.allValues().orEmpty()
+
+/** 大区在全部 5 种语言里的名字，供电台搜索匹配。 */
+internal fun regionNamesInAllLanguages(regionId: String): List<String> =
+    regionTranslations[regionId]?.allValues().orEmpty()
+
+// 下面两张表会被 webApp/scripts/generate-worker-data.mjs 按原格式解析，改格式前先看那个脚本。
 private val regionTranslations = mapOf(
     "hokkaido-tohoku" to LocalizedText("北海道・东北", "北海道・東北", "Hokkaido / Tohoku", "北海道・東北", "홋카이도 / 도호쿠"),
     "kanto" to LocalizedText("关东", "關東", "Kanto", "関東", "간토"),

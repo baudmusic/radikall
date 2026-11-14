@@ -16,13 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.radiko.i18n.appStrings
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import com.radiko.ui.viewmodel.PlayerState
 
 @Composable
@@ -35,6 +33,7 @@ fun PlayerBar(
     modifier: Modifier = Modifier,
 ) {
     val strings = appStrings()
+    val palette = radikoPalette()
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -44,17 +43,10 @@ fun PlayerBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            RadikoColors.PlayerBarGradientStart,
-                            RadikoColors.PlayerBarGradientEnd,
-                        ),
-                    ),
-                )
+                .background(palette.stage)
                 .drawBehind {
                     drawLine(
-                        color = Color.White.copy(alpha = 0.1f),
+                        color = palette.stageLine,
                         start = Offset(0f, 0f),
                         end = Offset(size.width, 0f),
                         strokeWidth = 0.5.dp.toPx(),
@@ -85,7 +77,7 @@ fun PlayerBar(
                     } else {
                         MaterialTheme.typography.titleMedium
                     },
-                    color = RadikoColors.White,
+                    color = palette.onStage,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -98,7 +90,7 @@ fun PlayerBar(
                     } else {
                         MaterialTheme.typography.bodyMedium
                     },
-                    color = RadikoColors.White.copy(alpha = 0.88f),
+                    color = palette.onStage2,
                 )
             }
 

@@ -19,37 +19,89 @@
   font-style: normal;
 }
 
+/*
+ * 配色全部取自日本の伝統色（https://nipponcolors.com/），中间层次用两色按比例混合或加透明度得到，不另造色值。
+ * 浅色是「胡粉的白 + 瑠璃 + 韓紅花」，保持清爽有冲击力；深色是墨底，整页只有韓紅花一种强色。
+ * 韓紅花是主题色，只表示「当前 / 选中 / 正在播」；瑠璃（深色下换成更亮的勿忘草）用于信息和蓝色舞台。
+ * 原生端 shared/.../ui/theme/RadikoTheme.kt 是同一套颜色。
+ */
 :root {
-  --primary-blue: #005caf;
-  --deep-blue: #113285;
-  --accent-red: #d0104c;
-  --white: #fafaf8;
-  --surface: #fafaf8;
-  --surface-variant: #f2f0ec;
-  --panel-blue: #eaf3f7;
-  --border-light: #e6e3de;
-  --text-primary: #2c2c2a;
-  --text-secondary: rgba(44, 44, 42, 0.72);
-  --shadow-soft: 0 14px 36px rgba(17, 50, 133, 0.08);
-  --shadow-blue: 0 14px 30px rgba(0, 92, 175, 0.16);
+  --nc-karakurenai: #d0104c; /* 韓紅花 */
+  --nc-gofun: #fffffb; /* 胡粉 */
+  --nc-shironeri: #fcfaf2; /* 白練 */
+  --nc-shironezumi: #bdc0ba; /* 白鼠 */
+  --nc-ginnezumi: #91989f; /* 銀鼠 */
+  --nc-nibi: #656765; /* 鈍 */
+  --nc-sumi: #1c1c1c; /* 墨 */
+  --nc-ro: #0c0c0c; /* 呂 */
+  --nc-ruri: #005caf; /* 瑠璃 */
+  --nc-konjyo: #113285; /* 紺青 */
+  --nc-rurikon: #0b346e; /* 瑠璃紺 */
+  --nc-wasurenagusa: #7db9de; /* 勿忘草 */
+
+  /* 浅色：胡粉的白底，蓝色只做轻的细线和淡底，强色留给韓紅花和蓝色舞台。 */
+  --page: var(--nc-gofun);
+  --surface: var(--nc-gofun);
+  --surface-sunken: color-mix(in srgb, var(--nc-ruri) 5%, var(--nc-gofun));
+  --line: color-mix(in srgb, var(--nc-ruri) 15%, transparent);
+  --line-strong: color-mix(in srgb, var(--nc-ruri) 30%, transparent);
+  --line-hover: color-mix(in srgb, var(--nc-ruri) 62%, transparent);
+  --progress: color-mix(in srgb, var(--nc-ruri) 50%, transparent);
+  --ink: var(--nc-sumi);
+  --ink-2: var(--nc-nibi);
+  --ink-3: var(--nc-ginnezumi);
+  --accent: var(--nc-karakurenai);
+  --on-accent: var(--nc-gofun);
+  --info: var(--nc-ruri);
+  --info-soft: color-mix(in srgb, var(--nc-ruri) 9%, transparent);
+  /* 台标签条、封面衬底：台标按白底设计，两种模式都用胡粉。 */
+  --plate: var(--nc-gofun);
+  /* 播放条和正在播放页的蓝色舞台：纯色瑠璃，不用渐变。 */
+  --stage: var(--nc-ruri);
+  --on-stage: var(--nc-gofun);
+  --on-stage-2: color-mix(in srgb, var(--nc-gofun) 80%, transparent);
+  --stage-line: color-mix(in srgb, var(--nc-gofun) 16%, transparent);
+  --stage-panel: var(--nc-gofun);
+  --shadow-soft: 0 14px 36px color-mix(in srgb, var(--nc-konjyo) 10%, transparent);
+  --scrim: color-mix(in srgb, var(--nc-sumi) 36%, transparent);
+  color-scheme: light;
+  accent-color: var(--nc-karakurenai);
   --font-sans: "Noto Sans JP Web", "PingFang SC", "Hiragino Sans", "Microsoft YaHei UI", sans-serif;
-  background: var(--white);
+  background: var(--page);
 }
 
+/* 深色「漆黑与朱」：墨的底，层次用少量胡粉叠出来；整页只有韓紅花一种强色。 */
 :root[data-theme="dark"] {
-  --white: #0f1724;
-  --surface: #162132;
-  --surface-variant: #1d2a3d;
-  --panel-blue: #1d2a3d;
-  --border-light: rgba(255, 255, 255, 0.12);
-  --text-primary: #f8fafc;
-  --text-secondary: rgba(248, 250, 252, 0.72);
-  --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.28);
-  --shadow-blue: 0 14px 30px rgba(0, 0, 0, 0.24);
+  --page: var(--nc-sumi);
+  --surface: color-mix(in srgb, var(--nc-gofun) 5%, var(--nc-sumi));
+  --surface-sunken: color-mix(in srgb, var(--nc-gofun) 9%, var(--nc-sumi));
+  --line: color-mix(in srgb, var(--nc-shironezumi) 16%, transparent);
+  --line-strong: color-mix(in srgb, var(--nc-shironezumi) 32%, transparent);
+  --line-hover: color-mix(in srgb, var(--nc-shironezumi) 55%, transparent);
+  --progress: color-mix(in srgb, var(--nc-shironezumi) 45%, transparent);
+  --ink: var(--nc-shironeri);
+  --ink-2: var(--nc-shironezumi);
+  --ink-3: var(--nc-ginnezumi);
+  --info: var(--nc-wasurenagusa);
+  --info-soft: color-mix(in srgb, var(--nc-wasurenagusa) 14%, transparent);
+  /* 深色舞台：同一家族里更深的纯色瑠璃紺。 */
+  --stage: var(--nc-rurikon);
+  --stage-panel: color-mix(in srgb, var(--nc-gofun) 7%, var(--nc-rurikon));
+  --shadow-soft: 0 14px 36px color-mix(in srgb, var(--nc-ro) 50%, transparent);
+  --scrim: color-mix(in srgb, var(--nc-ro) 58%, transparent);
+  color-scheme: dark;
+}
+
+/* 正在播放页是蓝色舞台：深色模式下，里面的面板和下沉层从瑠璃紺叠出来，不用外面墨色页面的中性灰。 */
+:root[data-theme="dark"] .now-playing-panel {
+  --surface: color-mix(in srgb, var(--nc-gofun) 7%, var(--nc-rurikon));
+  --surface-sunken: color-mix(in srgb, var(--nc-gofun) 12%, var(--nc-rurikon));
+  --line: color-mix(in srgb, var(--nc-gofun) 14%, transparent);
 }
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -58,10 +110,17 @@ body,
   min-height: 100%;
 }
 
+/* 这个 App 不需要下拉刷新：往回划列表、下拉收起播放页时都容易误触。
+   根滚动容器禁止越界，浏览器的下拉刷新（以及 iOS 的整页回弹）就不会触发。 */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
-  background: var(--white);
-  color: var(--text-primary);
+  background: var(--page);
+  color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -71,6 +130,7 @@ button,
 input,
 select {
   font: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button {
@@ -89,8 +149,8 @@ a {
 
 .app-shell {
   min-height: 100vh;
-  background: var(--white);
-  color: var(--text-primary);
+  background: var(--page);
+  color: var(--ink);
 }
 
 .home-header,
@@ -130,10 +190,10 @@ a {
   place-items: center;
   width: 42px;
   height: 42px;
-  border: 1px solid var(--accent-red);
+  border: 1px solid var(--accent);
   border-radius: 999px;
   background: transparent;
-  color: var(--accent-red);
+  color: var(--accent);
   transition:
     transform 160ms ease,
     background-color 160ms ease,
@@ -143,9 +203,9 @@ a {
 
 .icon-circle-button:hover {
   transform: scale(1.06);
-  background: var(--accent-red);
-  color: #fff;
-  box-shadow: 0 0 18px rgba(208, 16, 76, 0.24);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
 .icon-circle-button svg,
@@ -160,10 +220,10 @@ a {
   align-items: center;
   gap: 8px;
   padding: 10px 18px;
-  border: 1px solid var(--accent-red);
+  border: 1px solid var(--accent);
   border-radius: 999px;
-  color: #fff;
-  background: var(--accent-red);
+  color: var(--on-accent);
+  background: var(--accent);
   overflow: hidden;
   transition:
     transform 160ms ease,
@@ -176,8 +236,8 @@ a {
 .area-picker.open .area-pill {
   transform: scale(1.02);
   background: var(--surface);
-  color: var(--accent-red);
-  box-shadow: 0 0 18px rgba(208, 16, 76, 0.22);
+  color: var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .area-pill span {
@@ -192,6 +252,7 @@ a {
   place-items: center;
   width: 10px;
   height: 10px;
+  transition: transform 180ms ease;
 }
 
 .compact-chevron {
@@ -208,10 +269,16 @@ a {
 
 .area-picker {
   position: relative;
+  z-index: 4;
+}
+
+.area-picker.open .area-pill-chevron,
+.area-picker[data-menu-stage="open"] .area-pill-chevron {
+  transform: rotate(180deg);
 }
 
 .area-pill-button {
-  border: 1px solid var(--accent-red);
+  border: 1px solid var(--accent);
   font: inherit;
 }
 
@@ -224,10 +291,24 @@ a {
   max-height: min(66vh, 540px);
   overflow: auto;
   padding: 14px;
-  border: 1px solid rgba(208, 16, 76, 0.18);
+  border: 1px solid var(--line);
   border-radius: 24px;
   background: var(--surface);
   box-shadow: var(--shadow-soft);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px) scale(0.98);
+  transform-origin: top right;
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.area-picker.open .area-menu-panel,
+.area-picker[data-menu-stage="open"] .area-menu-panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 
 .area-menu-section {
@@ -238,11 +319,11 @@ a {
 .area-menu-section + .area-menu-section {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid var(--border-light);
+  border-top: 1px solid var(--line);
 }
 
 .area-menu-region {
-  color: var(--accent-red);
+  color: var(--accent);
   font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -255,11 +336,11 @@ a {
 
 .area-menu-item {
   width: 100%;
-  border: 1px solid rgba(0, 92, 175, 0.12);
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 12px 14px;
-  background: color-mix(in srgb, var(--surface-variant) 58%, transparent);
-  color: var(--text-primary);
+  background: transparent;
+  color: var(--ink);
   font: inherit;
   font-weight: 600;
   text-align: left;
@@ -274,9 +355,9 @@ a {
 .area-menu-item:focus-visible,
 .area-menu-item.selected {
   transform: scale(1.01);
-  border-color: var(--accent-red);
-  background: var(--accent-red);
-  color: #fff;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .search-strip {
@@ -289,19 +370,23 @@ a {
   border: 0;
   border-radius: 12px;
   padding: 16px 18px;
-  background: rgba(242, 240, 236, 0.75);
-  color: var(--text-primary);
+  background: var(--surface-sunken);
+  color: var(--ink);
   outline: none;
-  box-shadow: inset 0 0 0 1px rgba(0, 92, 175, 0.12);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.search-strip input::placeholder {
+  color: var(--ink-3);
 }
 
 .search-strip input:focus {
-  box-shadow: inset 0 0 0 1px rgba(0, 92, 175, 0.32);
+  box-shadow: inset 0 0 0 1px var(--ink-3);
 }
 
 .home-divider {
   height: 1px;
-  background: var(--border-light);
+  background: var(--line);
 }
 
 .install-guide-card {
@@ -311,10 +396,10 @@ a {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 20px;
   padding: 20px 22px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--line);
   border-radius: 24px;
   background:
-    linear-gradient(135deg, rgba(0, 92, 175, 0.1), rgba(17, 50, 133, 0.06)),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 6%, transparent), transparent 60%),
     var(--surface);
   box-shadow: var(--shadow-soft);
 }
@@ -335,8 +420,8 @@ a {
   width: fit-content;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(208, 16, 76, 0.12);
-  color: var(--accent-red);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -348,7 +433,7 @@ a {
 }
 
 .install-guide-copy p {
-  color: var(--text-secondary);
+  color: var(--ink-2);
   line-height: 1.72;
 }
 
@@ -356,7 +441,7 @@ a {
   padding-left: 18px;
   display: grid;
   gap: 8px;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .install-guide-actions {
@@ -381,27 +466,27 @@ a {
 
 .install-guide-primary {
   border: 0;
-  background: var(--accent-red);
-  color: #fff;
-  box-shadow: 0 0 20px rgba(208, 16, 76, 0.2);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .install-guide-primary:hover,
 .install-guide-primary:focus-visible {
   transform: scale(1.02);
-  box-shadow: 0 0 24px rgba(208, 16, 76, 0.28);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 .install-guide-secondary {
-  border: 1px solid rgba(0, 92, 175, 0.18);
-  background: rgba(255, 255, 255, 0.84);
-  color: var(--text-primary);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
 }
 
 .install-guide-secondary:hover,
 .install-guide-secondary:focus-visible {
   transform: scale(1.02);
-  background: var(--surface-variant);
+  background: var(--surface-sunken);
 }
 
 .status-banner {
@@ -412,14 +497,14 @@ a {
   gap: 18px;
   padding: 16px 18px;
   border-radius: 16px;
-  background: rgba(208, 16, 76, 0.12);
-  border: 1px solid rgba(208, 16, 76, 0.18);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .status-banner button {
   border: 0;
   background: transparent;
-  color: var(--accent-red);
+  color: var(--accent);
 }
 
 .station-stage {
@@ -428,25 +513,32 @@ a {
 
 .helper-text {
   margin: 0 0 18px;
-  color: var(--text-secondary);
+  color: var(--ink-2);
   line-height: 1.65;
 }
 
 .station-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 14px;
 }
 
+/* 横向卡片：左边「封面 + 白色台标签条」，右边节目名和「结束时间 · 主持人」，底部 2px 是节目进度。 */
 .station-card {
+  --media-w: 96px;
+  position: relative;
   display: grid;
-  gap: 8px;
+  grid-template-columns: var(--media-w) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
   width: 100%;
-  padding: 18px;
-  border: 1px solid rgba(0, 92, 175, 0.72);
+  padding: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
   border-radius: 16px;
   background: var(--surface);
-  color: var(--text-primary);
+  color: var(--ink);
+  font: inherit;
   text-align: left;
   transition:
     border-color 160ms ease,
@@ -456,41 +548,256 @@ a {
 
 .station-card:hover {
   transform: translateY(-1px);
+  border-color: var(--line-hover);
   box-shadow: var(--shadow-soft);
 }
 
 .station-card.active {
-  border-color: var(--accent-red);
+  border-color: var(--accent);
 }
 
-.station-card-logo {
-  display: grid;
-  place-items: center;
-  min-height: 72px;
-  border-radius: 12px;
-  background: var(--surface);
+/* 媒体块固定 96×86：16:10 的封面 + 26px 台标签条。台标按白底设计，深色模式下也保持白色。 */
+.station-media {
+  display: flex;
+  flex-direction: column;
+  width: var(--media-w);
+  height: calc(var(--media-w) * 86 / 96);
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--plate);
+  box-shadow: 0 0 0 1px var(--line);
 }
 
-.station-card-logo img {
-  max-height: 48px;
+.station-media.solo {
+  align-items: center;
+  justify-content: center;
+}
+
+.station-cover {
+  flex: none;
+  width: 100%;
+  height: calc(var(--media-w) * 0.625);
+  object-fit: cover;
+}
+
+.station-logo-strip {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* 外框只框住墨迹，整张台标图在框里往左上挪，把透明边藏到框外（尺寸由 stationLogo.ts 算好）。 */
+.station-logo-crop {
+  position: relative;
+  display: block;
+  flex: none;
+  overflow: hidden;
+}
+
+.station-logo-crop img {
+  position: absolute;
+  max-width: none;
+}
+
+.station-logo-fallback {
   object-fit: contain;
 }
 
-.station-card-id {
-  color: var(--text-secondary);
-  font-size: 0.74rem;
+.station-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* 台名眉标：小字次要色，地区标签跟在后面；当前台变红并带音柱。 */
+.station-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 0.75rem;
   font-weight: 500;
+  line-height: 1.35;
 }
 
-.station-card.active .station-card-id {
-  color: var(--accent-red);
+.station-eyebrow-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.station-card-name {
-  color: var(--text-primary);
+.station-card.active .station-eyebrow {
+  color: var(--accent);
+}
+
+.station-eq {
+  display: inline-flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 10px;
+}
+
+.station-eq i {
+  display: block;
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--accent);
+  transform-origin: bottom;
+}
+
+.station-eq i:nth-child(1) {
+  transform: scaleY(0.6);
+}
+
+.station-eq i:nth-child(3) {
+  transform: scaleY(0.4);
+}
+
+.station-eq.playing i {
+  animation: station-eq-bounce 900ms ease-in-out infinite alternate;
+}
+
+.station-eq.playing i:nth-child(2) {
+  animation-delay: -300ms;
+}
+
+.station-eq.playing i:nth-child(3) {
+  animation-delay: -600ms;
+}
+
+@keyframes station-eq-bounce {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .station-eq.playing i {
+    animation: none;
+  }
+}
+
+.station-program-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+}
+
+.station-program-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+}
+
+.station-program-meta-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 加载中：两条骨架占住标题和信息行的位置，数据回来时卡片不跳动。 */
+.station-skeleton {
+  display: grid;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.station-skeleton span {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--surface-sunken);
+  animation: station-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.station-skeleton span:first-child {
+  width: 82%;
+}
+
+.station-skeleton span:last-child {
+  width: 52%;
+}
+
+@keyframes station-skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .station-skeleton span {
+    animation: none;
+  }
+}
+
+.station-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--progress);
+  transition: width 600ms ease;
+}
+
+.station-card.active .station-progress {
+  background: var(--accent);
+  opacity: 1;
+}
+
+/* 搜索结果里「其他地区」的电台，标出它的覆盖范围。 */
+.station-card-area {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--info-soft);
+  color: var(--info);
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex: none;
+}
+
+.station-section + .station-section {
+  margin-top: 30px;
+}
+
+.station-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 14px;
+  color: var(--ink);
   font-size: 1rem;
+  font-weight: 600;
+}
+
+.station-section-count {
+  color: var(--ink-2);
+  font-size: 0.82rem;
   font-weight: 500;
-  line-height: 1.45;
+}
+
+.np-area-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .player-dock {
@@ -506,8 +813,8 @@ a {
   align-items: center;
   gap: 16px;
   padding: 14px 22px calc(14px + env(safe-area-inset-bottom));
-  background: linear-gradient(90deg, var(--primary-blue), var(--deep-blue));
-  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.1);
+  background: var(--stage);
+  box-shadow: 0 -1px 0 var(--stage-line);
 }
 
 .player-bar-main {
@@ -515,7 +822,7 @@ a {
   gap: 4px;
   border: 0;
   background: transparent;
-  color: #fff;
+  color: var(--on-stage);
   text-align: left;
 }
 
@@ -533,18 +840,18 @@ a {
 
 .player-bar-subtitle {
   font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--on-stage-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .player-bar-action {
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--stage-line);
   border-radius: 999px;
   padding: 12px 24px;
-  background: #fff;
-  color: var(--primary-blue);
+  background: var(--nc-gofun);
+  color: var(--stage);
   font-weight: 700;
   transition:
     transform 160ms ease,
@@ -553,7 +860,7 @@ a {
 
 .player-bar-action:hover {
   transform: scale(1.025);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--nc-gofun) 28%, transparent);
 }
 
 .player-bar-action:disabled {
@@ -565,24 +872,50 @@ a {
   position: fixed;
   inset: 0;
   z-index: 40;
+  pointer-events: none;
+}
+
+.overlay-shell[data-overlay-stage="opening"],
+.overlay-shell[data-overlay-stage="open"],
+.overlay-shell[data-overlay-stage="closing"] {
+  pointer-events: auto;
 }
 
 .overlay-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 23, 36, 0.34);
+  background: var(--scrim);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.overlay-shell[data-overlay-stage="open"] .overlay-backdrop {
+  opacity: 1;
 }
 
 .overlay-panel {
   position: absolute;
   inset: 0;
   overflow: auto;
+  /* 播放页滚到顶再往下拉是「收起」手势，越界滚动不能传给页面去触发下拉刷新 */
+  overscroll-behavior: contain;
+  will-change: transform, opacity;
 }
 
 .settings-panel {
-  background: var(--white);
-  color: var(--text-primary);
+  background: var(--page);
+  color: var(--ink);
   padding: 24px 24px 120px;
+  opacity: 0;
+  transform: translateX(40px);
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+.overlay-shell[data-overlay-stage="open"][data-overlay-view="settings"] .settings-panel {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .settings-shell {
@@ -606,16 +939,16 @@ a {
 
 .settings-heading p {
   margin: 4px 0 0;
-  color: var(--text-secondary);
+  color: var(--ink-2);
   line-height: 1.6;
 }
 
 .settings-banner {
   padding: 12px 16px;
   border-radius: 18px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
-  background: var(--panel-blue);
-  color: var(--primary-blue);
+  border: 1px solid var(--line);
+  background: var(--surface-sunken);
+  color: var(--info);
   box-shadow: var(--shadow-soft);
 }
 
@@ -623,7 +956,7 @@ a {
   display: grid;
   gap: 16px;
   padding: 20px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--line);
   border-radius: 24px;
   background: var(--surface);
 }
@@ -636,7 +969,7 @@ a {
 
 .settings-section-card > p {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--ink-2);
   line-height: 1.7;
 }
 
@@ -653,7 +986,7 @@ a {
   gap: 10px;
   padding: 16px;
   border-radius: 18px;
-  background: color-mix(in srgb, var(--surface-variant) 55%, transparent);
+  background: var(--surface-sunken);
 }
 
 .settings-row-copy {
@@ -664,7 +997,7 @@ a {
 .settings-row-copy strong,
 .settings-select-card > strong,
 .settings-note-card strong {
-  color: var(--text-primary);
+  color: var(--ink);
   font-size: 1rem;
   font-weight: 600;
 }
@@ -673,7 +1006,7 @@ a {
 .settings-row-copy em,
 .settings-note-card p,
 .settings-select-card > span {
-  color: var(--text-secondary);
+  color: var(--ink-2);
   line-height: 1.6;
 }
 
@@ -699,11 +1032,11 @@ a {
 }
 
 .pill-button {
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 10px 16px;
   background: var(--surface);
-  color: var(--accent-red);
+  color: var(--ink);
   font-weight: 500;
   transition:
     transform 160ms ease,
@@ -715,9 +1048,9 @@ a {
 .pill-button:hover,
 .pill-button.selected {
   transform: scale(1.02);
-  border-color: var(--accent-red);
-  background: var(--accent-red);
-  color: #fff;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .pill-button.disabled {
@@ -747,11 +1080,11 @@ a {
 
 .settings-select-card select {
   width: 100%;
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px 16px;
   background: var(--surface);
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .settings-area-pill {
@@ -779,15 +1112,15 @@ a {
   gap: 0;
   width: 100%;
   padding: 16px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--line);
   border-radius: 18px;
-  background: color-mix(in srgb, var(--surface-variant) 55%, transparent);
+  background: var(--surface-sunken);
   color: inherit;
   text-align: left;
 }
 
 .settings-action-card span {
-  color: var(--text-secondary);
+  color: var(--ink-2);
   line-height: 1.6;
 }
 
@@ -796,20 +1129,20 @@ a {
   gap: 14px;
   padding: 18px;
   border-radius: 18px;
-  background: color-mix(in srgb, var(--surface-variant) 55%, transparent);
+  background: var(--surface-sunken);
 }
 
 .settings-about-title {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .settings-about-version,
 .settings-about-note,
 .settings-about-block p {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--ink-2);
   line-height: 1.7;
 }
 
@@ -819,35 +1152,45 @@ a {
 }
 
 .settings-about-block strong {
-  color: var(--text-primary);
+  color: var(--ink);
   font-size: 0.96rem;
   font-weight: 700;
 }
 
 .settings-about-block.accent-red strong {
-  color: var(--accent-red);
+  color: var(--accent);
 }
 
 .settings-about-block.accent-blue strong {
-  color: var(--primary-blue);
+  color: var(--info);
 }
 
 .settings-about-link {
   width: fit-content;
-  color: var(--primary-blue);
+  color: var(--info);
   font-weight: 600;
   text-decoration: underline;
 }
 
 .overlay-shell-blue .overlay-backdrop {
-  background: rgba(5, 12, 28, 0.48);
+  background: var(--scrim);
 }
 
 .now-playing-panel {
-  background: linear-gradient(180deg, var(--primary-blue) 0%, var(--deep-blue) 48%, var(--deep-blue) 100%);
-  color: #fff;
+  background: var(--stage);
+  color: var(--on-stage);
   padding: 12px 24px 120px;
   overflow-x: hidden;
+  transform: translateY(calc(100% + var(--sheet-drag-offset, 0px)));
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.overlay-shell[data-overlay-stage="open"][data-overlay-view="now-playing"] .now-playing-panel {
+  transform: translateY(var(--sheet-drag-offset, 0px));
+}
+
+.overlay-shell[data-sheet-dragging="true"][data-overlay-view="now-playing"] .now-playing-panel {
+  transition: none;
 }
 
 .now-playing-shell {
@@ -860,7 +1203,7 @@ a {
   height: 4px;
   margin: 0 auto 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.34);
+  background: color-mix(in srgb, var(--on-stage) 34%, transparent);
 }
 
 .now-playing-topbar {
@@ -869,10 +1212,10 @@ a {
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--stage-line);
   border-radius: 30px;
-  background: var(--panel-blue);
-  color: var(--text-primary);
+  background: var(--stage-panel);
+  color: var(--ink);
 }
 
 .topbar-circle-button {
@@ -880,10 +1223,10 @@ a {
   place-items: center;
   width: 52px;
   height: 52px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--panel-blue);
-  color: var(--primary-blue);
+  background: var(--surface-sunken);
+  color: var(--ink-2);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
@@ -892,8 +1235,8 @@ a {
 
 .topbar-circle-button:hover {
   transform: scale(1.04);
-  border-color: rgba(0, 92, 175, 0.28);
-  box-shadow: var(--shadow-blue);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-soft);
 }
 
 .topbar-copy {
@@ -902,9 +1245,14 @@ a {
   min-width: 0;
 }
 
+/* 「再生中」做成韓紅花底的小徽章（像电台的 ON AIR 灯）：红字直接压在蓝色面板上看不清。 */
 .topbar-eyebrow {
-  color: var(--primary-blue);
-  font-size: 0.82rem;
+  width: fit-content;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -912,7 +1260,7 @@ a {
 
 .topbar-copy h2 {
   margin: 0;
-  color: var(--text-primary);
+  color: var(--ink);
   font-size: 1.35rem;
   line-height: 1.3;
   overflow-wrap: anywhere;
@@ -924,9 +1272,9 @@ a {
   width: 124px;
   height: 52px;
   padding: 9px 12px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--line);
   border-radius: 18px;
-  background: var(--panel-blue);
+  background: var(--plate);
 }
 
 .topbar-logo-chip img {
@@ -936,7 +1284,7 @@ a {
 
 .sheet-helper-text {
   margin: 18px 0 0;
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--on-stage-2);
   line-height: 1.7;
 }
 
@@ -981,22 +1329,22 @@ a {
 
 .np-section-heading h3 {
   margin: 0;
-  color: #fff;
+  color: var(--on-stage);
   font-size: 1.5rem;
   line-height: 1.3;
 }
 
 .np-section-heading p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--on-stage-2);
   line-height: 1.6;
 }
 
 .np-section-card {
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--stage-line);
   border-radius: 24px;
-  background: var(--panel-blue);
-  color: var(--text-primary);
+  background: var(--stage-panel);
+  color: var(--ink);
   box-shadow: var(--shadow-soft);
 }
 
@@ -1031,9 +1379,9 @@ a {
   overflow: hidden;
   min-height: 220px;
   padding: 16px;
-  border: 1px solid rgba(0, 92, 175, 0.16);
+  border: 1px solid var(--line);
   border-radius: 18px;
-  background: var(--surface);
+  background: var(--surface-sunken);
 }
 
 .np-artwork-frame img {
@@ -1058,7 +1406,7 @@ a {
 }
 
 .np-meta-block span {
-  color: var(--text-secondary);
+  color: var(--ink-2);
   font-size: 0.88rem;
   font-weight: 600;
 }
@@ -1071,6 +1419,13 @@ a {
 .np-play-action {
   justify-self: stretch;
   padding-block: 16px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.np-play-action:hover {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 .np-description-card,
@@ -1085,14 +1440,14 @@ a {
 .np-link-url,
 .np-muted-copy {
   margin: 0;
-  color: var(--text-primary);
+  color: var(--ink);
   line-height: 1.72;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
 .np-muted-copy {
-  color: var(--text-secondary);
+  color: var(--ink-2);
 }
 
 .np-link-card {
@@ -1112,7 +1467,7 @@ a {
   width: fit-content;
   border: 0;
   background: transparent;
-  color: var(--primary-blue);
+  color: var(--info);
   font-weight: 600;
   padding: 0;
 }
@@ -1130,12 +1485,12 @@ a {
 
 .chip-button {
   padding: 11px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid var(--line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.94);
-  color: var(--text-primary);
+  background: var(--surface-sunken);
+  color: var(--ink);
   font-weight: 600;
-  box-shadow: 0 0 0 rgba(0, 92, 175, 0);
+  box-shadow: 0 0 0 transparent;
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
@@ -1146,22 +1501,10 @@ a {
 .chip-button:hover,
 .chip-button.selected {
   transform: scale(1.03);
-  background: var(--primary-blue);
-  color: #fff;
-  box-shadow: 0 0 20px rgba(0, 92, 175, 0.28);
-}
-
-:root[data-theme="dark"] .chip-button {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
-:root[data-theme="dark"] .chip-button:hover,
-:root[data-theme="dark"] .chip-button.selected {
-  background: #fff;
-  color: var(--primary-blue);
-  border-color: #fff;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
 .history-card {
@@ -1177,9 +1520,9 @@ a {
 
 .history-song-card {
   padding: 18px;
-  border: 1px solid rgba(0, 92, 175, 0.12);
+  border: 1px solid var(--line);
   border-radius: 16px;
-  background: var(--panel-blue);
+  background: var(--surface-sunken);
 }
 
 .song-card-content {
@@ -1198,7 +1541,7 @@ a {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-sunken);
 }
 
 .song-artwork-frame img {
@@ -1215,7 +1558,7 @@ a {
 .song-artist,
 .song-date,
 .song-time {
-  color: var(--text-secondary);
+  color: var(--ink-2);
 }
 
 .song-artist {
@@ -1268,26 +1611,17 @@ a {
   gap: 14px;
   padding: 14px 16px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--text-primary);
-}
-
-:root[data-theme="dark"] .schedule-program-row {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-sunken);
+  color: var(--ink);
 }
 
 .schedule-program-row.current {
-  background: var(--primary-blue);
-  color: #fff;
-}
-
-:root[data-theme="dark"] .schedule-program-row.current {
-  background: var(--primary-blue);
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .schedule-program-row.past {
-  color: var(--accent-red);
+  color: var(--ink-3);
 }
 
 .schedule-program-row time {
@@ -1322,11 +1656,26 @@ a {
 
 .boot-error p {
   max-width: 640px;
-  color: var(--text-secondary);
+  color: var(--ink-2);
 }
 
-.driving .station-card-name {
-  font-size: 1.1rem;
+.driving .station-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+}
+
+.driving .station-card {
+  --media-w: 116px;
+  gap: 14px;
+  padding: 12px;
+}
+
+.driving .station-program-title {
+  font-size: 1.06rem;
+}
+
+.driving .station-program-meta,
+.driving .station-eyebrow {
+  font-size: 0.86rem;
 }
 
 .driving .player-bar-title {
@@ -1392,7 +1741,7 @@ a {
   }
 
   .station-grid {
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   }
 
   .settings-panel,

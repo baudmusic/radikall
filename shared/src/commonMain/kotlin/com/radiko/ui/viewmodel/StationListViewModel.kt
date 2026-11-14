@@ -1,17 +1,20 @@
 package com.radiko.ui.viewmodel
 
-import com.radiko.station.Station
-import com.radiko.station.StationRegistry
+import com.radiko.station.StationCatalog
+import com.radiko.station.StationSection
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 data class StationListState(
+    /** 正在浏览的地区，可以是 [com.radiko.station.ALL_AREAS_ID]。 */
     val currentAreaId: String = "JP13",
     val searchQuery: String = "",
-    val stations: List<Station> = StationRegistry.getStationsForArea("JP13"),
-)
+    val sections: List<StationSection> = StationCatalog.sections(areaId = "JP13", query = ""),
+) {
+    val isEmpty: Boolean get() = sections.all { it.stations.isEmpty() }
+}
 
 class StationListViewModel {
     private val _state = MutableStateFlow(StationListState())
@@ -21,7 +24,7 @@ class StationListViewModel {
         _state.update { current ->
             current.copy(
                 currentAreaId = areaId,
-                stations = stationsFor(areaId = areaId, query = current.searchQuery),
+                sections = StationCatalog.sections(areaId = areaId, query = current.searchQuery),
             )
         }
     }
@@ -30,22 +33,8 @@ class StationListViewModel {
         _state.update { current ->
             current.copy(
                 searchQuery = query,
-                stations = stationsFor(areaId = current.currentAreaId, query = query),
+                sections = StationCatalog.sections(areaId = current.currentAreaId, query = query),
             )
         }
     }
-
-    fun getStationsForCurrentArea(): List<Station> = _state.value.stations
-
-    fun searchStations(query: String): List<Station> = StationRegistry.search(
-        query = query,
-        areaId = _state.value.currentAreaId,
-    )
-
-    private fun stationsFor(areaId: String, query: String): List<Station> = if (query.isBlank()) {
-        StationRegistry.getStationsForArea(areaId)
-    } else {
-        StationRegistry.search(query = query, areaId = areaId)
-    }
 }
-

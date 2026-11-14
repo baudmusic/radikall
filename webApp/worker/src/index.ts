@@ -1,7 +1,13 @@
 import { authenticate, currentEpochMillis } from "./auth";
 import { encryptPlaybackToken, decryptPlaybackToken } from "./crypto";
-import { allowedUpstreamHostSuffixes, bootstrapData, stationById } from "./data";
-import { buildNowPlayingResponse, buildScheduleResponse, findCurrentProgramForStation } from "./program";
+import { allowedUpstreamHostSuffixes, bootstrapData, prefectureIds, stationById } from "./data";
+import {
+  buildAreaNowPlayingResponse,
+  buildNowPlayingResponse,
+  buildScheduleResponse,
+  findCurrentProgramForStation,
+  getAreaNowFeed,
+} from "./program";
 import { buildLiveStreamUrl } from "./stream";
 import type {
   Env,
@@ -57,6 +63,16 @@ async function routeRequest(request: Request, env: Env): Promise<Response> {
     return jsonResponse(await buildNowPlayingResponse(stationId));
   }
 
+  const areaNowMatch = path.match(/^\/api\/areas\/([^/]+)\/now-playing$/u);
+  if (areaNowMatch && request.method === "GET") {
+    const areaId = decodeURIComponent(areaNowMatch[1]);
+    if (!prefectureIds.has(areaId)) {
+      throw new HttpError(404, `Unknown area: ${areaId}`);
+    }
+    // 允许浏览器缓存 60 秒：快速来回切地区时不必重复请求。
+    return jsonResponse(buildAreaNowPlayingResponse(await getAreaNowFeed(areaId)), 200, "public, max-age=60");
+  }
+
   const scheduleMatch = path.match(/^\/api\/stations\/([^/]+)\/schedule$/u);
   if (scheduleMatch && request.method === "GET") {
     const stationId = decodeURIComponent(scheduleMatch[1]);
@@ -67,9 +83,9 @@ async function routeRequest(request: Request, env: Env): Promise<Response> {
   if (path === "/api/playback/live-session" && request.method === "POST") {
     const body = (await request.json()) as LiveSessionRequest;
     const station = assertKnownStation(body.stationId);
-    const authSession = await authenticate(body.preferredAreaId);
+    const authSession = await authenticate(resolveAuthAreaId(station, body.preferredAreaId));
     const upstreamMasterUrl = await buildLiveStreamUrl(station.id);
-    const currentProgram = await findCurrentProgramForStation(station.id);
+    const currentProgram = await findCurrentProgramForStation(station.id, authSession.areaId);
     const issuedAtEpochMillis = currentEpochMillis();
     const expiresAtEpochMillis = issuedAtEpochMillis + SESSION_TTL_MS;
     const sessionId = await encryptPlaybackToken(env.RADIKALL_SESSION_SECRET, {
@@ -127,6 +143,19 @@ function filterStations(areaId: string | null, query: string): StationSummary[] 
     const haystack = `${station.id} ${station.name}`.toLowerCase();
     return haystack.includes(query);
   });
+}
+
+// radiko 只给认证地区内的电台放流，地区不覆盖该电台时串流会 403。
+// 前端给的地区覆盖该电台就照用，否则退回电台的第一个收听地区。
+function resolveAuthAreaId(station: StationSummary, preferredAreaId: unknown): string {
+  if (typeof preferredAreaId === "string" && station.areaIds.includes(preferredAreaId)) {
+    return preferredAreaId;
+  }
+  const fallbackAreaId = station.areaIds[0];
+  if (fallbackAreaId == null) {
+    throw new HttpError(500, `Station has no service area: ${station.id}`);
+  }
+  return fallbackAreaId;
 }
 
 function assertKnownStation(stationId: string): StationSummary {
@@ -240,12 +269,12 @@ function isPlaylistResponse(targetUrl: string, contentType: string): boolean {
     normalizedType.includes("vnd.apple.mpegurl");
 }
 
-function jsonResponse(body: unknown, status = 200): Response {
+function jsonResponse(body: unknown, status = 200, cacheControl = "no-store"): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
+      "Cache-Control": cacheControl,
     },
   });
 }

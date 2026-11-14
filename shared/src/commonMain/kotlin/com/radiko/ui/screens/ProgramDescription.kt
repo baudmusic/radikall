@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.radiko.i18n.appStrings
 import com.radiko.platform.openUrl
 import com.radiko.station.ProgramEntry
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import com.radiko.ui.theme.radikoPanelBorderColor
 import com.radiko.ui.theme.radikoPanelColor
 import com.radiko.ui.theme.radikoPrimaryTextColor
@@ -41,7 +41,7 @@ fun ProgramDescription(
             text = strings.programDetailsTitle,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = RadikoColors.White,
+            color = radikoPalette().onStage,
         )
 
         Column(
@@ -123,7 +123,7 @@ private fun ProgramSiteSection(
         TextButton(onClick = onOpen) {
             Text(
                 text = ctaLabel,
-                color = RadikoColors.PrimaryBlue,
+                color = radikoPalette().info,
                 fontWeight = FontWeight.SemiBold,
             )
         }

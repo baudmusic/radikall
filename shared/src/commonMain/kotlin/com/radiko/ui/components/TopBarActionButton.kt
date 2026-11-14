@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.radiko.platform.PlatformEnvironment
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -52,11 +52,11 @@ fun TopBarActionButton(
         label = "topbar_action_button_scale",
     )
     val backgroundColor by animateColorAsState(
-        targetValue = if (hovered) RadikoColors.AccentRed else Color.Transparent,
+        targetValue = if (hovered) radikoPalette().accent else Color.Transparent,
         label = "topbar_action_button_background",
     )
     val iconColor by animateColorAsState(
-        targetValue = if (hovered) Color.White else RadikoColors.AccentRed,
+        targetValue = if (hovered) radikoPalette().onAccent else radikoPalette().accent,
         label = "topbar_action_button_icon",
     )
     val hoverModifier = if (PlatformEnvironment.supportsPointerHover) {

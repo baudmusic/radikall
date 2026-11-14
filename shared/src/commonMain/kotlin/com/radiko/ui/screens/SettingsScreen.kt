@@ -28,6 +28,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,7 +59,7 @@ import com.radiko.settings.StartupAreaMode
 import com.radiko.station.StationRegistry
 import com.radiko.ui.components.TopBarActionButton
 import com.radiko.ui.components.drawBackArrowIcon
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import com.radiko.ui.theme.radikoPanelBorderColor
 import com.radiko.ui.theme.radikoPanelColor
 import com.radiko.ui.theme.radikoPrimaryTextColor
@@ -422,7 +423,7 @@ fun SettingsScreen(
                             cacheClearMessage = strings.cacheClearMessage(PlatformRuntimeInfo.clearCaches())
                         },
                     shape = RoundedCornerShape(18.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f),
+                    color = radikoPalette().surfaceSunken,
                     border = BorderStroke(1.dp, radikoPanelBorderColor()),
                 ) {
                     Column(
@@ -487,7 +488,7 @@ fun SettingsScreen(
         AboutBlock(
             label = strings.aboutOpenSourceLabel,
             body = strings.aboutOpenSourceBody,
-            labelColor = RadikoColors.AccentRed,
+            labelColor = radikoPalette().accent,
         )
 
         // 原始仓库（可点击）
@@ -533,7 +534,7 @@ fun SettingsScreen(
         AboutBlock(
             label = strings.aboutDisclaimerLabel,
             body = strings.aboutDisclaimerBody,
-            labelColor = RadikoColors.PrimaryBlue,
+            labelColor = radikoPalette().info,
         )
     }
 }
@@ -552,7 +553,7 @@ private fun SettingsBanner(message: String) {
         Text(
             text = message,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            color = RadikoColors.PrimaryBlue,
+            color = radikoPalette().info,
             style = MaterialTheme.typography.bodyMedium,
         )
     }
@@ -599,7 +600,7 @@ private fun SettingsToggleRow(
 ) {
     Surface(
         shape = RoundedCornerShape(18.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f),
+        color = radikoPalette().surfaceSunken,
     ) {
         Row(
             modifier = Modifier
@@ -626,6 +627,12 @@ private fun SettingsToggleRow(
             Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
+                // 打开时用韓紅花（「选中」），和 Web 复选框的勾选色一致
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = radikoPalette().onAccent,
+                    checkedTrackColor = radikoPalette().accent,
+                    checkedBorderColor = radikoPalette().accent,
+                ),
             )
         }
     }
@@ -671,15 +678,15 @@ private fun RowScope.OptionPill(
         label = "settings_option_pill_scale",
     )
     val containerColor by animateColorAsState(
-        targetValue = if (highlighted) RadikoColors.AccentRed else MaterialTheme.colorScheme.surface,
+        targetValue = if (highlighted) radikoPalette().accent else radikoPalette().surface,
         label = "settings_option_pill_container",
     )
     val borderColor by animateColorAsState(
-        targetValue = if (highlighted) RadikoColors.AccentRed else radikoPanelBorderColor(),
+        targetValue = if (highlighted) radikoPalette().accent else radikoPanelBorderColor(),
         label = "settings_option_pill_border",
     )
     val textColor by animateColorAsState(
-        targetValue = if (highlighted) Color.White else RadikoColors.AccentRed,
+        targetValue = if (highlighted) radikoPalette().onAccent else radikoPalette().ink,
         label = "settings_option_pill_text",
     )
 
@@ -742,7 +749,7 @@ private fun <T> SettingsDropdownField(
                         indication = null,
                     ) { expanded = true },
                 shape = RoundedCornerShape(18.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.34f),
+                color = radikoPalette().surfaceSunken,
                 border = BorderStroke(1.dp, radikoPanelBorderColor()),
             ) {
                 Text(
@@ -801,7 +808,7 @@ private fun SettingsNote(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = RadikoColors.PrimaryBlue,
+                color = radikoPalette().info,
             )
             Text(
                 text = body,
@@ -842,7 +849,7 @@ private fun AboutLinkRow(
         style = MaterialTheme.typography.bodySmall.copy(
             textDecoration = TextDecoration.Underline,
         ),
-        color = RadikoColors.PrimaryBlue,
+        color = radikoPalette().info,
         modifier = Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = null,

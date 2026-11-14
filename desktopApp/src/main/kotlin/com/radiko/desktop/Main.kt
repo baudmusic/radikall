@@ -160,6 +160,7 @@ fun main() = application {
                             AreaSelector(
                                 currentAreaId = playerState.currentAreaId,
                                 onAreaSelected = playerViewModel::switchArea,
+                                includeAllAreas = true,
                             )
                         },
                     )

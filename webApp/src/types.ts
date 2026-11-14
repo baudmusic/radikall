@@ -76,6 +76,24 @@ export interface NowPlayingResponse {
   recentSongs: OnAirSong[];
 }
 
+/** 首页卡片用的精简节目信息。时间是东京时间的 yyyyMMddHHmmss。 */
+export interface StationProgramSlot {
+  title: string;
+  performer: string | null;
+  imageUrl: string | null;
+  startAt: string;
+  endAt: string;
+}
+
+/** GET /api/areas/:areaId/now-playing：该地区每个电台的「当前 + 下一档」节目。 */
+export interface AreaNowPlayingResponse {
+  areaId: string;
+  /** 建议的刷新间隔（秒），来自 radiko 的 <ttl>。 */
+  ttlSeconds: number;
+  /** 键是台号；每个电台的节目按开始时间排好，通常是 2 档。 */
+  stations: Record<string, StationProgramSlot[]>;
+}
+
 export interface ScheduleResponse {
   stationId: string;
   todayPrograms: ProgramEntry[];

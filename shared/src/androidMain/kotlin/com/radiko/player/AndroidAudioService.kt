@@ -6,6 +6,14 @@ import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 
+/**
+ * 只负责前台通知和系统媒体控件。MediaSession 和 ExoPlayer 都归 [AndroidExoRadioPlayer] 所有，
+ * 这里只挂上/摘下，**绝不 release**。
+ *
+ * 暂停或播放出错后服务会退出前台，App 在后台待一会儿系统就会把它回收（onDestroy）。
+ * 以前 onDestroy 顺手把会话 release 了，播放器手里却还拿着这个已释放的会话；
+ * 回到 App 再按播放时，它被交给新起的服务，addSession 直接抛异常，App 闪退。
+ */
 class AndroidAudioService : MediaSessionService() {
     private var mediaSession: MediaSession? = null
 
@@ -29,7 +37,6 @@ class AndroidAudioService : MediaSessionService() {
             return
         }
         mediaSession?.let(::removeSession)
-        mediaSession?.release()
         mediaSession = session
         addSession(session)
         pendingSession = null
@@ -52,7 +59,6 @@ class AndroidAudioService : MediaSessionService() {
 
     override fun onDestroy() {
         mediaSession?.let(::removeSession)
-        mediaSession?.release()
         mediaSession = null
         if (instance === this) {
             instance = null

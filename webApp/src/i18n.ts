@@ -67,7 +67,7 @@ type Messages = Record<MessageKey, string>;
 const zhCn: Messages = {
   appTitle: "Radikall Web",
   tagline: "面向 iPhone 主屏的 Radikall Web 版本。",
-  searchPlaceholder: "搜索电台名称或台号",
+  searchPlaceholder: "搜索电台、台号或地区",
   loading: "加载中...",
   loadingDetails: "正在刷新节目详情...",
   openNowPlaying: "打开播放页",
@@ -129,8 +129,10 @@ const zhCn: Messages = {
 
 const zhTw: Messages = {
   ...zhCn,
+  openSettings: "開啟設定",
+  nowPlaying: "播放頁",
   tagline: "面向 iPhone 主畫面的 Radikall Web 版本。",
-  searchPlaceholder: "搜尋電台名稱或台號",
+  searchPlaceholder: "搜尋電台、台號或地區",
   loading: "載入中...",
   loadingDetails: "正在更新節目詳情...",
   close: "關閉",
@@ -182,7 +184,7 @@ const zhTw: Messages = {
 const en: Messages = {
   appTitle: "Radikall Web",
   tagline: "A home-screen-friendly Radikall web app.",
-  searchPlaceholder: "Search by station name or id",
+  searchPlaceholder: "Search stations, IDs or areas",
   loading: "Loading...",
   loadingDetails: "Refreshing program details...",
   openNowPlaying: "Open now playing",
@@ -246,7 +248,7 @@ const ja: Messages = {
   ...en,
   appTitle: "Radikall Web",
   tagline: "iPhone のホーム画面向け Radikall Web 版です。",
-  searchPlaceholder: "局名または station id で検索",
+  searchPlaceholder: "放送局・局ID・地域で検索",
   loading: "読み込み中...",
   loadingDetails: "番組情報を更新しています...",
   openNowPlaying: "再生画面を開く",
@@ -302,7 +304,7 @@ const ko: Messages = {
   ...en,
   appTitle: "Radikall Web",
   tagline: "iPhone 홈 화면용 Radikall 웹 버전입니다.",
-  searchPlaceholder: "방송국 이름 또는 station id 검색",
+  searchPlaceholder: "방송국, 코드 또는 지역 검색",
   loading: "불러오는 중...",
   loadingDetails: "프로그램 정보를 새로고침하는 중...",
   openNowPlaying: "재생 화면 열기",

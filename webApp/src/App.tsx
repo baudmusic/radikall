@@ -1,8 +1,27 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import type Hls from "hls.js";
 import { api } from "./api/client";
 import { languageLabels, localizeText, t } from "./i18n";
+import { useClock } from "./hooks";
+import {
+  findSlotAt,
+  NowOnAirStore,
+  programProgress,
+  tokyoCompactTimestamp,
+  useNowOnAirPrograms,
+} from "./nowOnAir";
+import { StationCard } from "./StationCard";
+import { StationSection } from "./StationSection";
+import {
+  ALL_AREAS_ID,
+  areaLabel,
+  catalogCopy,
+  coverageLabel,
+  createStationCatalog,
+  formatUntil,
+  sectionTitle,
+} from "./stationCatalog";
 import {
   detectInstallGuideKind,
   installGuideCopy,
@@ -39,7 +58,15 @@ import {
 } from "./utils";
 
 type OverlayView = "settings" | "now-playing" | null;
+type OverlayStage = "opening" | "open" | "closing";
 type SongHistoryMode = "current-program" | "full-station";
+type SwipeGestureState = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  triggered: boolean;
+  armedAtTop?: boolean;
+};
 
 const DEFAULT_PLAYBACK_STATE: PlaybackState = {
   currentStation: null,
@@ -52,24 +79,29 @@ const DEFAULT_PLAYBACK_STATE: PlaybackState = {
 };
 
 const DETAILS_REFRESH_MS = 60_000;
+const OVERLAY_ANIMATION_MS = 280;
+const SWIPE_TRIGGER_PX = 72;
+const HOME_SWIPE_EDGE_ZONE_PX = 180;
 
 export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const currentStationRef = useRef<StationSummary | null>(null);
   const currentAreaRef = useRef("JP13");
+  const playbackAreaRef = useRef<string | null>(null);
   const reconnectRef = useRef<() => void>(() => undefined);
   const reconnectingRef = useRef(false);
   const playbackAttemptRef = useRef(0);
   const scheduleListRef = useRef<HTMLDivElement | null>(null);
+  const nowPlayingPanelRef = useRef<HTMLElement | null>(null);
+  const homeSwipeRef = useRef<SwipeGestureState | null>(null);
+  const nowPlayingSwipeRef = useRef<SwipeGestureState | null>(null);
 
   const [bootstrap, setBootstrap] = useState<BootstrapResponse | null>(null);
   const [settings, setSettings] = useState<WebSettings | null>(null);
-  const [overlay, setOverlay] = useState<OverlayView>(null);
+  const { overlay, overlayStage, openOverlay, closeOverlay } = useAnimatedOverlay(OVERLAY_ANIMATION_MS);
   const [selectedAreaId, setSelectedAreaId] = useState("JP13");
   const [searchInput, setSearchInput] = useState("");
-  const [stations, setStations] = useState<StationSummary[]>([]);
-  const [stationsLoading, setStationsLoading] = useState(false);
   const [bootstrapError, setBootstrapError] = useState<string | null>(null);
   const [playback, setPlayback] = useState<PlaybackState>(DEFAULT_PLAYBACK_STATE);
   const [nowPlaying, setNowPlaying] = useState<NowPlayingResponse | null>(null);
@@ -82,6 +114,7 @@ export default function App() {
   const [cacheClearMessage, setCacheClearMessage] = useState<string | null>(null);
   const [installPromptEvent, setInstallPromptEvent] = useState<DeferredInstallPromptEvent | null>(null);
   const [installGuideDismissed, setInstallGuideDismissed] = useState(false);
+  const [sheetDragOffset, setSheetDragOffset] = useState(0);
 
   const deferredSearch = useDeferredValue(searchInput);
   const language = settings?.language ?? "en";
@@ -89,11 +122,38 @@ export default function App() {
   const detailStation = playback.currentStation ?? findStation(bootstrap, settings?.lastStationId ?? null);
   const detailRequestStation = overlay === "now-playing" ? detailStation : null;
   const activeProgram = nowPlaying?.currentProgram ?? playback.currentProgram;
-  const currentArea = bootstrap?.prefectures.find((item) => item.id === selectedAreaId) ?? null;
+  // 电台目录随 bootstrap 一次下发，分组和搜索都在本地算，打字时不发请求。
+  const stationCatalog = useMemo(() => (bootstrap == null ? null : createStationCatalog(bootstrap)), [bootstrap]);
+  const stationSections = useMemo(
+    () => stationCatalog?.sections(selectedAreaId, deferredSearch) ?? [],
+    [deferredSearch, selectedAreaId, stationCatalog],
+  );
+  // 换地区或改搜索词后回到列表顶部，不然从下面切到「全国」会停在长列表的半中间。
+  const listResetReady = useRef(false);
+  useEffect(() => {
+    if (!listResetReady.current) {
+      listResetReady.current = true;
+      return;
+    }
+    window.scrollTo({ top: 0 });
+  }, [deferredSearch, selectedAreaId]);
+  // 卡片上的当前节目：按地区批量取、有效期内复用（见 nowOnAir.ts），时钟每 30 秒走一格，整点自动切到下一档。
+  const nowOnAirStore = useMemo(() => (stationCatalog == null ? null : new NowOnAirStore(stationCatalog)), [stationCatalog]);
+  const nowOnAir = useNowOnAirPrograms(nowOnAirStore);
+  const clockNow = useClock(30_000);
+  const nowTimestamp = tokyoCompactTimestamp(clockNow);
+  const preferredAreaIds = useMemo(
+    () => [selectedAreaId, playback.resolvedAreaId].filter((areaId) => areaId !== ALL_AREAS_ID),
+    [playback.resolvedAreaId, selectedAreaId],
+  );
+  const playingSlot = playback.currentStation == null
+    ? null
+    : findSlotAt(nowOnAir.programs.get(playback.currentStation.id), nowTimestamp);
   const fixedArea = bootstrap?.prefectures.find((item) => item.id === settings?.fixedAreaId) ?? null;
   const resolvedArea = bootstrap?.prefectures.find((item) => item.id === playback.resolvedAreaId) ?? null;
+  // 播放条优先用节目缓存（随时钟切换），以前只在打开详情页时才会刷新。
   const playerProgramTitle = playback.currentStation != null
-    ? activeProgram?.title ?? t(language, "playerIdleSubtitle")
+    ? playingSlot?.title ?? activeProgram?.title ?? t(language, "playerIdleSubtitle")
     : t(language, "playerIdleSubtitle");
 
   const programDescriptionBlocks = useMemo(
@@ -188,6 +248,14 @@ export default function App() {
     currentAreaRef.current = selectedAreaId;
   }, [selectedAreaId]);
 
+  // 正在播的台不一定在当前列表里（比如切到了别的地区），单独保证它的节目数据，播放条才能跟着换节目。
+  useEffect(() => {
+    const station = playback.currentStation;
+    if (station != null && nowOnAirStore != null) {
+      void nowOnAirStore.ensureStations([station], [playback.resolvedAreaId]);
+    }
+  }, [clockNow, nowOnAirStore, playback.currentStation, playback.resolvedAreaId]);
+
   useEffect(() => {
     if (settings == null) {
       return;
@@ -196,11 +264,14 @@ export default function App() {
     applyTheme(settings.themeMode);
   }, [settings]);
 
+  // 「固定启动地区」只决定启动时停在哪；在设置里改这一项时立即切过去一次，之后仍可自由切换浏览地区。
+  // （以前依赖里带着 selectedAreaId，固定模式下每次切走都会被立刻拉回来。）
+  const fixedStartupAreaId = settings?.startupAreaMode === "fixed" ? settings.fixedAreaId : null;
   useEffect(() => {
-    if (settings?.startupAreaMode === "fixed" && settings.fixedAreaId !== selectedAreaId) {
-      setSelectedAreaId(settings.fixedAreaId);
+    if (fixedStartupAreaId != null) {
+      setSelectedAreaId(fixedStartupAreaId);
     }
-  }, [selectedAreaId, settings?.fixedAreaId, settings?.startupAreaMode]);
+  }, [fixedStartupAreaId]);
 
   useEffect(() => {
     if (cacheClearMessage == null) {
@@ -210,6 +281,24 @@ export default function App() {
     const timeoutId = window.setTimeout(() => setCacheClearMessage(null), 2400);
     return () => window.clearTimeout(timeoutId);
   }, [cacheClearMessage]);
+
+  useEffect(() => {
+    if (overlay == null) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [overlay]);
+
+  useEffect(() => {
+    if (overlay !== "now-playing") {
+      setSheetDragOffset(0);
+    }
+  }, [overlay]);
 
   useEffect(() => {
     setSongHistoryMode("current-program");
@@ -318,39 +407,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (bootstrap == null) {
-      return;
-    }
-
-    let cancelled = false;
-
-    async function loadStations(): Promise<void> {
-      try {
-        setStationsLoading(true);
-        const response = await api.getStations(selectedAreaId, deferredSearch);
-        if (!cancelled) {
-          setStations(response);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setBootstrapError(getErrorMessage(error));
-          setStations([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setStationsLoading(false);
-        }
-      }
-    }
-
-    void loadStations();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [bootstrap, deferredSearch, selectedAreaId]);
-
-  useEffect(() => {
     if (detailRequestStation == null) {
       setNowPlaying(null);
       setSchedule(null);
@@ -405,13 +461,139 @@ export default function App() {
     };
   }, [detailRequestStation?.id]);
 
-  async function startPlayback(station: StationSummary, preferredAreaId: string): Promise<void> {
+  function showSettings(): void {
+    setSheetDragOffset(0);
+    startTransition(() => openOverlay("settings"));
+  }
+
+  function showNowPlaying(): void {
+    if (detailStation == null) {
+      return;
+    }
+    setSheetDragOffset(0);
+    startTransition(() => openOverlay("now-playing"));
+  }
+
+  function hideOverlay(preserveSheetOffset = false): void {
+    if (!preserveSheetOffset) {
+      setSheetDragOffset(0);
+    }
+    closeOverlay();
+  }
+
+  function handleHomePointerDown(event: ReactPointerEvent<HTMLElement>): void {
+    if (overlay != null || playback.currentStation == null) {
+      homeSwipeRef.current = null;
+      return;
+    }
+
+    homeSwipeRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      triggered: false,
+    };
+  }
+
+  function handleHomePointerMove(event: ReactPointerEvent<HTMLElement>): void {
+    const gesture = homeSwipeRef.current;
+    if (
+      gesture == null
+      || gesture.pointerId !== event.pointerId
+      || gesture.triggered
+      || overlay != null
+      || playback.currentStation == null
+    ) {
+      return;
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+    if (!isSwipeVertical(deltaX, deltaY) || deltaY >= -SWIPE_TRIGGER_PX) {
+      return;
+    }
+    if (!isNearViewportBottom(gesture.startY) || !isWindowScrolledToBottom()) {
+      return;
+    }
+
+    gesture.triggered = true;
+    showNowPlaying();
+  }
+
+  function handleHomePointerEnd(event: ReactPointerEvent<HTMLElement>): void {
+    if (homeSwipeRef.current?.pointerId === event.pointerId) {
+      homeSwipeRef.current = null;
+    }
+  }
+
+  function handleNowPlayingPointerDown(event: ReactPointerEvent<HTMLElement>): void {
+    if (overlay !== "now-playing") {
+      nowPlayingSwipeRef.current = null;
+      return;
+    }
+
+    const panel = nowPlayingPanelRef.current;
+    nowPlayingSwipeRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      triggered: false,
+      armedAtTop: (panel?.scrollTop ?? 0) <= 0,
+    };
+  }
+
+  function handleNowPlayingPointerMove(event: ReactPointerEvent<HTMLElement>): void {
+    const gesture = nowPlayingSwipeRef.current;
+    const panel = nowPlayingPanelRef.current;
+    if (gesture == null || panel == null || gesture.pointerId !== event.pointerId || overlay !== "now-playing") {
+      return;
+    }
+
+    const deltaX = event.clientX - gesture.startX;
+    const deltaY = event.clientY - gesture.startY;
+
+    if (!gesture.armedAtTop) {
+      gesture.armedAtTop = panel.scrollTop <= 0;
+    }
+    if (!gesture.armedAtTop || !isSwipeVertical(deltaX, deltaY) || deltaY <= 0) {
+      return;
+    }
+
+    const nextOffset = Math.min(deltaY * 0.92, window.innerHeight * 0.72);
+    setSheetDragOffset(nextOffset);
+  }
+
+  function handleNowPlayingPointerEnd(event: ReactPointerEvent<HTMLElement>): void {
+    const gesture = nowPlayingSwipeRef.current;
+    if (gesture == null || gesture.pointerId !== event.pointerId) {
+      return;
+    }
+
+    nowPlayingSwipeRef.current = null;
+    if (sheetDragOffset >= SWIPE_TRIGGER_PX) {
+      hideOverlay(true);
+      return;
+    }
+    setSheetDragOffset(0);
+  }
+
+  // 认证地区必须覆盖该电台才能放流：优先用正在浏览的地区，其次沿用上次播放成功的地区，
+  // 都不覆盖时用电台自己的第一个收听地区。浏览地区本身不会因此改变。
+  function pickPreferredAreaId(station: StationSummary): string {
+    const candidates = [currentAreaRef.current, playbackAreaRef.current];
+    return candidates.find((areaId): areaId is string => areaId != null && station.areaIds.includes(areaId))
+      ?? station.areaIds[0]
+      ?? currentAreaRef.current;
+  }
+
+  async function startPlayback(station: StationSummary): Promise<void> {
     const audio = audioRef.current;
     if (audio == null) {
       return;
     }
 
     const requestId = ++playbackAttemptRef.current;
+    const preferredAreaId = pickPreferredAreaId(station);
 
     setPlayback((previous) => ({
       ...previous,
@@ -463,6 +645,7 @@ export default function App() {
         return;
       }
 
+      playbackAreaRef.current = session.resolvedAreaId;
       setPlayback({
         currentStation: station,
         currentProgram: session.currentProgram,
@@ -472,12 +655,12 @@ export default function App() {
         expiresAtEpochMillis: session.expiresAtEpochMillis,
         error: null,
       });
+      // lastAreaId 只记用户选的浏览地区；播放跨区电台不应改掉下次启动时的地区。
       setSettings((previous) =>
         previous == null
           ? previous
           : {
               ...previous,
-              lastAreaId: session.resolvedAreaId,
               lastStationId: station.id,
             },
       );
@@ -518,7 +701,7 @@ export default function App() {
     }));
 
     try {
-      await startPlayback(station, currentAreaRef.current);
+      await startPlayback(station);
     } finally {
       reconnectingRef.current = false;
     }
@@ -559,12 +742,19 @@ export default function App() {
     }));
   }
 
+  // 从详情页的「可收听地区」跳去某个地区浏览：清掉搜索词，让列表直接显示那个地区。
+  function browseAreaFromDetails(areaId: string): void {
+    changeArea(areaId);
+    setSearchInput("");
+    hideOverlay();
+  }
+
   function togglePlayback(station: StationSummary): void {
     if (playback.currentStation?.id === station.id && playback.isPlaying) {
       stopPlayback();
       return;
     }
-    void startPlayback(station, selectedAreaId);
+    void startPlayback(station);
   }
 
   function togglePlaybackFromBar(): void {
@@ -574,7 +764,7 @@ export default function App() {
     if (playback.isPlaying) {
       stopPlayback();
     } else {
-      void startPlayback(playback.currentStation, selectedAreaId);
+      void startPlayback(playback.currentStation);
     }
   }
 
@@ -583,7 +773,7 @@ export default function App() {
     if (station == null) {
       return;
     }
-    void startPlayback(station, selectedAreaId);
+    void startPlayback(station);
   }
 
   async function clearLocalCaches(): Promise<void> {
@@ -640,17 +830,18 @@ export default function App() {
             <button
               type="button"
               className="icon-circle-button"
-              onClick={() => startTransition(() => setOverlay("settings"))}
+              onClick={showSettings}
               aria-label={t(language, "openSettings")}
             >
               <SettingsIcon />
             </button>
             <AreaPicker
               bootstrap={bootstrap}
-              currentLabel={currentArea ? localizeText(currentArea.names, language) : selectedAreaId}
+              currentLabel={areaLabel(bootstrap, selectedAreaId, language)}
               language={language}
               value={selectedAreaId}
               onSelect={changeArea}
+              includeAllAreas
             />
           </div>
         </div>
@@ -703,34 +894,51 @@ export default function App() {
         </div>
       ) : null}
 
-      <main className="station-stage">
-        {stationsLoading ? <p className="helper-text">{t(language, "searching")}</p> : null}
-        {!stationsLoading && stations.length === 0 ? <p className="helper-text">{t(language, "noStations")}</p> : null}
+      <main
+        className="station-stage"
+        onPointerDown={handleHomePointerDown}
+        onPointerMove={handleHomePointerMove}
+        onPointerUp={handleHomePointerEnd}
+        onPointerCancel={handleHomePointerEnd}
+      >
+        {bootstrap != null && stationSections.length === 0 ? (
+          <p className="helper-text">{t(language, "noStations")}</p>
+        ) : null}
 
-        <div className="station-grid">
-          {stations.map((station) => {
-            const isCurrent = playback.currentStation?.id === station.id;
-            return (
-              <button
-                key={station.id}
-                type="button"
-                className={`station-card ${isCurrent ? "active" : ""}`}
-                onClick={() => void startPlayback(station, selectedAreaId)}
-              >
-                <div className="station-card-logo">
-                  <img
-                    src={station.logoUrl}
-                    alt={station.name}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                <span className="station-card-id">{station.id}</span>
-                <strong className="station-card-name">{station.name}</strong>
-              </button>
-            );
-          })}
-        </div>
+        {stationSections.map((section, sectionIndex) => (
+          <StationSection
+            key={section.key}
+            eager={sectionIndex === 0}
+            title={sectionTitle(bootstrap, section, language)}
+            stations={section.stations}
+            store={nowOnAirStore}
+            preferredAreaIds={preferredAreaIds}
+            refreshKey={clockNow.getTime()}
+          >
+            {section.stations.map((station) => {
+              const slot = findSlotAt(nowOnAir.programs.get(station.id), nowTimestamp);
+              return (
+                <StationCard
+                  key={station.id}
+                  station={station}
+                  active={playback.currentStation?.id === station.id}
+                  playing={playback.currentStation?.id === station.id && playback.isPlaying}
+                  program={slot}
+                  programState={slot != null ? "ready" : nowOnAir.settled.has(station.id) ? "unavailable" : "loading"}
+                  progress={slot == null ? 0 : programProgress(slot, clockNow)}
+                  endLabel={slot == null ? null : formatUntil(language, slot.endAt)}
+                  areaLabel={
+                    section.kind === "other-areas" && stationCatalog != null
+                      ? coverageLabel(bootstrap, stationCatalog.coverage(station), language)
+                      : null
+                  }
+                  emphasized={settings?.drivingModeEnabled ?? false}
+                  onSelect={() => void startPlayback(station)}
+                />
+              );
+            })}
+          </StationSection>
+        ))}
       </main>
 
       <footer className="player-dock">
@@ -739,11 +947,7 @@ export default function App() {
             type="button"
             className="player-bar-main"
             disabled={detailStation == null}
-            onClick={() => {
-              if (detailStation != null) {
-                startTransition(() => setOverlay("now-playing"));
-              }
-            }}
+            onClick={showNowPlaying}
           >
             <span className="player-bar-title">
               {playback.currentStation?.name ?? t(language, "playerIdleTitle")}
@@ -762,12 +966,12 @@ export default function App() {
       </footer>
 
       {overlay === "settings" ? (
-        <div className="overlay-shell">
-          <div className="overlay-backdrop" onClick={() => setOverlay(null)} />
+        <div className="overlay-shell" data-overlay-view="settings" data-overlay-stage={overlayStage}>
+          <div className="overlay-backdrop" onClick={() => hideOverlay()} />
           <section className="overlay-panel settings-panel">
             <div className="settings-shell">
               <header className="settings-topbar">
-                <button type="button" className="icon-circle-button" onClick={() => setOverlay(null)}>
+                <button type="button" className="icon-circle-button" onClick={() => hideOverlay()}>
                   <BackArrowIcon />
                 </button>
                 <div className="settings-heading">
@@ -927,14 +1131,27 @@ export default function App() {
       ) : null}
 
       {overlay === "now-playing" ? (
-        <div className="overlay-shell overlay-shell-blue">
-          <div className="overlay-backdrop" onClick={() => setOverlay(null)} />
-          <section className="overlay-panel now-playing-panel">
+        <div
+          className="overlay-shell overlay-shell-blue"
+          data-overlay-view="now-playing"
+          data-overlay-stage={overlayStage}
+          data-sheet-dragging={sheetDragOffset > 0 ? "true" : "false"}
+        >
+          <div className="overlay-backdrop" onClick={() => hideOverlay()} />
+          <section
+            ref={nowPlayingPanelRef}
+            className="overlay-panel now-playing-panel"
+            style={{ "--sheet-drag-offset": `${sheetDragOffset}px` } as CSSProperties}
+            onPointerDown={handleNowPlayingPointerDown}
+            onPointerMove={handleNowPlayingPointerMove}
+            onPointerUp={handleNowPlayingPointerEnd}
+            onPointerCancel={handleNowPlayingPointerEnd}
+          >
             <div className="now-playing-shell">
               <div className="sheet-handle" />
 
               <header className="now-playing-topbar">
-                <button type="button" className="topbar-circle-button" onClick={() => setOverlay(null)}>
+                <button type="button" className="topbar-circle-button" onClick={() => hideOverlay()}>
                   <ChevronDownIcon />
                 </button>
                 <div className="topbar-copy">
@@ -1031,6 +1248,28 @@ export default function App() {
                       ) : null}
                     </section>
                   </div>
+
+                  {stationCatalog != null ? (
+                    <section className="np-section np-area-section">
+                      <div className="np-section-heading">
+                        <h3>{catalogCopy(language).serviceAreasLabel}</h3>
+                      </div>
+                      <div className="np-area-chips">
+                        {(stationCatalog.isNationwide(detailStation)
+                          ? [ALL_AREAS_ID]
+                          : stationCatalog.sortedAreaIds(detailStation)
+                        ).map((areaId) => (
+                          <ChipButton
+                            key={areaId}
+                            selected={areaId === selectedAreaId}
+                            onClick={() => browseAreaFromDetails(areaId)}
+                          >
+                            {areaLabel(bootstrap, areaId, language)}
+                          </ChipButton>
+                        ))}
+                      </div>
+                    </section>
+                  ) : null}
 
                   {detailsError ? <p className="sheet-helper-text">{detailsError}</p> : null}
 
@@ -1150,6 +1389,94 @@ export default function App() {
       ) : null}
     </div>
   );
+}
+
+function useAnimatedOverlay(durationMs: number) {
+  const [overlay, setOverlay] = useState<OverlayView>(null);
+  const [overlayStage, setOverlayStage] = useState<OverlayStage>("open");
+  const closeTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current != null) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
+
+  function openOverlay(nextOverlay: Exclude<OverlayView, null>): void {
+    if (closeTimerRef.current != null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    setOverlay(nextOverlay);
+    setOverlayStage("opening");
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setOverlayStage("open"));
+    });
+  }
+
+  function closeOverlay(): void {
+    if (overlay == null) {
+      return;
+    }
+
+    setOverlayStage("closing");
+    if (closeTimerRef.current != null) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+    closeTimerRef.current = window.setTimeout(() => {
+      setOverlay(null);
+      setOverlayStage("open");
+      closeTimerRef.current = null;
+    }, durationMs);
+  }
+
+  return {
+    overlay,
+    overlayStage,
+    openOverlay,
+    closeOverlay,
+  };
+}
+
+function useAnimatedPresence(isOpen: boolean, durationMs: number) {
+  const [isMounted, setIsMounted] = useState(isOpen);
+  const [stage, setStage] = useState<OverlayStage>(isOpen ? "open" : "closing");
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (timerRef.current != null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (isOpen) {
+      setIsMounted(true);
+      setStage("opening");
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setStage("open"));
+      });
+      return;
+    }
+
+    setStage("closing");
+    timerRef.current = window.setTimeout(() => {
+      setIsMounted(false);
+      timerRef.current = null;
+    }, durationMs);
+  }, [durationMs, isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current != null) {
+        window.clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  return { isMounted, stage };
 }
 
 function SettingsSectionCard({
@@ -1288,6 +1615,7 @@ function AreaPicker({
   language,
   value,
   onSelect,
+  includeAllAreas = false,
 }: {
   bootstrap: BootstrapResponse | null;
   className?: string;
@@ -1295,9 +1623,12 @@ function AreaPicker({
   language: LanguageCode;
   value: string;
   onSelect: (areaId: string) => void;
+  /** 在菜单顶部提供「全国」（ALL_AREAS_ID）。只用于浏览，设置里选固定地区时不提供。 */
+  includeAllAreas?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
+  const { isMounted: renderMenu, stage: menuStage } = useAnimatedPresence(open, 220);
 
   const groupedPrefectures = useMemo(() => {
     if (bootstrap == null) {
@@ -1320,13 +1651,13 @@ function AreaPicker({
 
     function handlePointerDown(event: MouseEvent): void {
       if (pickerRef.current != null && !pickerRef.current.contains(event.target as Node)) {
-        setOpen(false);
+        closeMenu();
       }
     }
 
     function handleKeyDown(event: KeyboardEvent): void {
       if (event.key === "Escape") {
-        setOpen(false);
+        closeMenu();
       }
     }
 
@@ -1338,8 +1669,16 @@ function AreaPicker({
     };
   }, [open]);
 
+  function closeMenu(): void {
+    setOpen(false);
+  }
+
   return (
-    <div ref={pickerRef} className={`area-picker ${open ? "open" : ""} ${className ?? ""}`.trim()}>
+    <div
+      ref={pickerRef}
+      className={`area-picker ${open ? "open" : ""} ${className ?? ""}`.trim()}
+      data-menu-stage={menuStage}
+    >
       <button
         type="button"
         className="area-pill area-pill-button"
@@ -1353,8 +1692,24 @@ function AreaPicker({
         </span>
       </button>
 
-      {open ? (
+      {renderMenu ? (
         <div className="area-menu-panel" role="listbox" aria-label={t(language, "startupArea")}>
+          {includeAllAreas ? (
+            <section className="area-menu-section">
+              <div className="area-menu-items">
+                <button
+                  type="button"
+                  className={`area-menu-item ${value === ALL_AREAS_ID ? "selected" : ""}`}
+                  onClick={() => {
+                    onSelect(ALL_AREAS_ID);
+                    closeMenu();
+                  }}
+                >
+                  {catalogCopy(language).allAreas}
+                </button>
+              </div>
+            </section>
+          ) : null}
           {groupedPrefectures.map((group) => (
             <section key={group.id} className="area-menu-section">
               <strong className="area-menu-region">{group.name}</strong>
@@ -1368,7 +1723,7 @@ function AreaPicker({
                       className={`area-menu-item ${selected ? "selected" : ""}`}
                       onClick={() => {
                         onSelect(prefecture.id);
-                        setOpen(false);
+                        closeMenu();
                       }}
                     >
                       {localizeText(prefecture.names, language)}
@@ -1691,6 +2046,19 @@ function isIgnorablePlaybackError(error: unknown): boolean {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
+}
+
+function isNearViewportBottom(startY: number): boolean {
+  return window.innerHeight - startY <= HOME_SWIPE_EDGE_ZONE_PX;
+}
+
+function isWindowScrolledToBottom(): boolean {
+  const root = document.documentElement;
+  return window.innerHeight + window.scrollY >= root.scrollHeight - 8;
+}
+
+function isSwipeVertical(deltaX: number, deltaY: number): boolean {
+  return Math.abs(deltaY) > Math.abs(deltaX) * 1.1;
 }
 
 function localeForLanguage(language: LanguageCode): string {

@@ -28,14 +28,13 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.radiko.i18n.AppStrings
 import com.radiko.i18n.appStrings
 import com.radiko.station.ProgramEntry
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import com.radiko.ui.theme.radikoPanelColor
 import com.radiko.ui.theme.radikoPrimaryTextColor
 import com.radiko.ui.theme.radikoSecondaryTextColor
@@ -53,7 +52,6 @@ fun WeeklySchedule(
     onSelectDay: (Int) -> Unit,
 ) {
     val strings = appStrings()
-    val useDarkThemeStyling = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val listState = rememberLazyListState()
     val currentProgramIndex = programs.indexOfFirst { program ->
         currentProgram != null &&
@@ -92,7 +90,7 @@ fun WeeklySchedule(
             text = strings.weeklyScheduleTitle,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = RadikoColors.White,
+            color = radikoPalette().onStage,
         )
 
         Column(
@@ -116,19 +114,6 @@ fun WeeklySchedule(
                         text = formatDateLabel(dateStr, strings),
                         selected = index == selectedDayIndex,
                         onClick = { onSelectDay(index) },
-                        selectedContainerColor = RadikoColors.ScheduleHighlight,
-                        selectedContentColor = RadikoColors.White,
-                        containerColor = if (useDarkThemeStyling) {
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.92f)
-                        } else {
-                            RadikoColors.White.copy(alpha = 0.92f)
-                        },
-                        contentColor = if (useDarkThemeStyling) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            radikoPrimaryTextColor()
-                        },
-                        glowColor = RadikoColors.ScheduleHighlight,
                     )
                 }
             }
@@ -191,24 +176,13 @@ private fun ScheduleProgramItem(
     isPast: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val useDarkThemeStyling = MaterialTheme.colorScheme.surface.luminance() < 0.5f
-    val backgroundColor = when {
-        isCurrent -> RadikoColors.ScheduleHighlight
-        isPast -> if (useDarkThemeStyling) {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.98f)
-        } else {
-            RadikoColors.AccentRed.copy(alpha = 0.06f)
-        }
-        else -> if (useDarkThemeStyling) {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.92f)
-        } else {
-            RadikoColors.White.copy(alpha = 0.88f)
-        }
-    }
+    // 正在播的一档用韓紅花；播完的变淡（以前是红字，会和「正在播」混淆）。
+    val palette = radikoPalette()
+    val backgroundColor = if (isCurrent) palette.accent else palette.surfaceSunken
     val textColor = when {
-        isCurrent -> RadikoColors.White
-        isPast -> RadikoColors.PastProgramRed
-        else -> radikoPrimaryTextColor()
+        isCurrent -> palette.onAccent
+        isPast -> palette.ink3
+        else -> palette.ink
     }
 
     Row(

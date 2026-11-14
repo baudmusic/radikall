@@ -18,3 +18,10 @@ DerivedData/
 .DS_Store
 .dev.vars
 .wrangler/
+
+# Android Studio 签名打包的输出：安装包放到 GitHub Release，不进仓库
+androidApp/release/
+
+# 私人文档
+docs/radikall-resume-analysis/
+docs/resume-project-analysis.zh-CN.md

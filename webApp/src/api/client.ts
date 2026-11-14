@@ -1,4 +1,5 @@
 import type {
+  AreaNowPlayingResponse,
   BootstrapResponse,
   LiveSessionRequest,
   LiveSessionResponse,
@@ -49,6 +50,9 @@ export const api = {
   },
   getNowPlaying(stationId: string): Promise<NowPlayingResponse> {
     return request(`/api/stations/${encodeURIComponent(stationId)}/now-playing`);
+  },
+  getAreaNowPlaying(areaId: string): Promise<AreaNowPlayingResponse> {
+    return request(`/api/areas/${encodeURIComponent(areaId)}/now-playing`);
   },
   getSchedule(stationId: string): Promise<ScheduleResponse> {
     return request(`/api/stations/${encodeURIComponent(stationId)}/schedule?day=today`);

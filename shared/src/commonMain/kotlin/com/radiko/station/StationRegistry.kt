@@ -1,7 +1,11 @@
 package com.radiko.station
 
+import com.radiko.text.narrowAlphanumerics
+
 object StationRegistry {
-    val allStations = listOf(
+    // 台名照抄 radiko 官方（含「ＨＢＣラジオ」这类全角英数），显示前统一转半角。
+    // 下面这张表会被 webApp/scripts/generate-worker-data.mjs 按原格式解析，Station(...) 行的写法别改。
+    val allStations: List<Station> = listOf(
         Station(id = "802", name = "FM802", areaIds = listOf("JP25", "JP26", "JP27", "JP28", "JP29", "JP30")),
         Station(id = "HBC", name = "ＨＢＣラジオ", areaIds = listOf("JP1")),
         Station(id = "STV", name = "ＳＴＶラジオ", areaIds = listOf("JP1")),
@@ -111,7 +115,7 @@ object StationRegistry {
         Station(id = "RN1", name = "ラジオNIKKEI第1", areaIds = listOf("JP1", "JP2", "JP3", "JP4", "JP5", "JP6", "JP7", "JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14", "JP15", "JP16", "JP17", "JP18", "JP19", "JP20", "JP21", "JP22", "JP23", "JP24", "JP25", "JP26", "JP27", "JP28", "JP29", "JP30", "JP31", "JP32", "JP33", "JP34", "JP35", "JP36", "JP37", "JP38", "JP39", "JP40", "JP41", "JP42", "JP43", "JP44", "JP45", "JP46", "JP47")),
         Station(id = "RN2", name = "ラジオNIKKEI第2", areaIds = listOf("JP1", "JP2", "JP3", "JP4", "JP5", "JP6", "JP7", "JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14", "JP15", "JP16", "JP17", "JP18", "JP19", "JP20", "JP21", "JP22", "JP23", "JP24", "JP25", "JP26", "JP27", "JP28", "JP29", "JP30", "JP31", "JP32", "JP33", "JP34", "JP35", "JP36", "JP37", "JP38", "JP39", "JP40", "JP41", "JP42", "JP43", "JP44", "JP45", "JP46", "JP47")),
         Station(id = "JOAK-FM", name = "NHK-FM（東京）", areaIds = listOf("JP1", "JP2", "JP3", "JP4", "JP5", "JP6", "JP7", "JP8", "JP9", "JP10", "JP11", "JP12", "JP13", "JP14", "JP15", "JP16", "JP17", "JP18", "JP19", "JP20", "JP21", "JP22", "JP23", "JP24", "JP25", "JP26", "JP27", "JP28", "JP29", "JP30", "JP31", "JP32", "JP33", "JP34", "JP35", "JP36", "JP37", "JP38", "JP39", "JP40", "JP41", "JP42", "JP43", "JP44", "JP45", "JP46", "JP47"))
-    )
+    ).map { it.copy(name = it.name.narrowAlphanumerics()) }
 
     private val stationsById = allStations.associateBy { it.id }
 

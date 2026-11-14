@@ -32,18 +32,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.radiko.i18n.appStrings
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import com.radiko.ui.theme.radikoPrimaryTextColor
 
 @Composable
@@ -59,7 +56,7 @@ fun NowPlayingTopBar(
     val closeHovered by closeInteraction.collectIsHoveredAsState()
     val logoInteraction = remember { MutableInteractionSource() }
     val logoHovered by logoInteraction.collectIsHoveredAsState()
-    val useDarkThemeStyling = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val palette = radikoPalette()
 
     val barOnlyHovered = barHovered && !closeHovered && !logoHovered
     val barScale by animateFloatAsState(
@@ -70,20 +67,9 @@ fun NowPlayingTopBar(
         targetValue = if (barOnlyHovered) 10.dp else 0.dp,
         label = "top_bar_glow_elevation",
     )
-    val barContainerColor by animateColorAsState(
-        targetValue = if (barOnlyHovered) {
-            RadikoColors.ScheduleLightBlue
-        } else {
-            RadikoColors.ScheduleLightBlue
-        },
-        label = "top_bar_container",
-    )
+    val barContainerColor = palette.panel
     val barBorderColor by animateColorAsState(
-        targetValue = if (barOnlyHovered) {
-            RadikoColors.PrimaryBlue.copy(alpha = 0.26f)
-        } else {
-            RadikoColors.PrimaryBlue.copy(alpha = 0.16f)
-        },
+        targetValue = if (barOnlyHovered) palette.lineStrong else palette.line,
         label = "top_bar_border",
     )
 
@@ -103,7 +89,7 @@ fun NowPlayingTopBar(
                     .width(48.dp)
                     .height(4.dp)
                     .background(
-                        color = RadikoColors.PrimaryBlue.copy(alpha = 0.35f),
+                        color = palette.onStage.copy(alpha = 0.34f),
                         shape = RoundedCornerShape(999.dp),
                     ),
             )
@@ -126,8 +112,8 @@ fun NowPlayingTopBar(
                 .shadow(
                     elevation = barGlowElevation,
                     shape = RoundedCornerShape(30.dp),
-                    ambientColor = RadikoColors.PrimaryBlue.copy(alpha = 0.18f),
-                    spotColor = RadikoColors.PrimaryBlue.copy(alpha = 0.18f),
+                    ambientColor = palette.shadow,
+                    spotColor = palette.shadow,
                 )
                 .background(
                     color = barContainerColor,
@@ -151,30 +137,22 @@ fun NowPlayingTopBar(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
+                // 「再生中」做成韓紅花底的小徽章（像电台的 ON AIR 灯）：红字直接压在面板上，深色模式下看不清。
                 Text(
                     text = strings.nowPlayingTitle,
-                    style = MaterialTheme.typography.labelLarge.copy(
+                    style = MaterialTheme.typography.labelSmall.copy(
                         letterSpacing = 0.8.sp,
                     ),
-                    color = RadikoColors.PrimaryBlue,
+                    color = palette.onAccent,
                     fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .background(color = palette.accent, shape = RoundedCornerShape(999.dp))
+                        .padding(horizontal = 9.dp, vertical = 2.dp),
                 )
                 Text(
                     text = stationName.ifBlank { strings.unknownStationFallback },
-                    style = if (useDarkThemeStyling) {
-                        MaterialTheme.typography.titleMedium.copy(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    RadikoColors.NowPlayingGradientTop,
-                                    RadikoColors.NowPlayingGradientMid,
-                                    RadikoColors.NowPlayingGradientBottom,
-                                ),
-                            ),
-                        )
-                    } else {
-                        MaterialTheme.typography.titleMedium
-                    },
-                    color = if (useDarkThemeStyling) Color.Unspecified else radikoPrimaryTextColor(),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = radikoPrimaryTextColor(),
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -201,20 +179,10 @@ private fun StationLogoChip(
         targetValue = if (hovered) 12.dp else 0.dp,
         label = "top_bar_logo_glow_elevation",
     )
-    val containerColor by animateColorAsState(
-        targetValue = if (hovered) {
-            RadikoColors.ScheduleLightBlue
-        } else {
-            RadikoColors.ScheduleLightBlue
-        },
-        label = "top_bar_logo_container",
-    )
+    val palette = radikoPalette()
+    val containerColor = palette.plate
     val borderColor by animateColorAsState(
-        targetValue = if (hovered) {
-            RadikoColors.PrimaryBlue.copy(alpha = 0.28f)
-        } else {
-            RadikoColors.PrimaryBlue.copy(alpha = 0.16f)
-        },
+        targetValue = if (hovered) palette.lineStrong else palette.line,
         label = "top_bar_logo_border",
     )
 
@@ -230,8 +198,8 @@ private fun StationLogoChip(
             .shadow(
                 elevation = glowElevation,
                 shape = RoundedCornerShape(18.dp),
-                ambientColor = RadikoColors.PrimaryBlue.copy(alpha = 0.14f),
-                spotColor = RadikoColors.PrimaryBlue.copy(alpha = 0.14f),
+                ambientColor = palette.shadow,
+                spotColor = palette.shadow,
             )
             .background(
                 color = containerColor,
@@ -270,20 +238,10 @@ private fun CollapseButton(
         targetValue = if (hovered) 14.dp else 0.dp,
         label = "top_bar_close_glow_elevation",
     )
-    val containerColor by animateColorAsState(
-        targetValue = if (hovered) {
-            RadikoColors.ScheduleLightBlue
-        } else {
-            RadikoColors.ScheduleLightBlue
-        },
-        label = "top_bar_close_container",
-    )
+    val palette = radikoPalette()
+    val containerColor = palette.surfaceSunken
     val borderColor by animateColorAsState(
-        targetValue = if (hovered) {
-            RadikoColors.PrimaryBlue.copy(alpha = 0.30f)
-        } else {
-            RadikoColors.PrimaryBlue.copy(alpha = 0.16f)
-        },
+        targetValue = if (hovered) palette.lineStrong else palette.line,
         label = "top_bar_close_border",
     )
 
@@ -298,8 +256,8 @@ private fun CollapseButton(
             .shadow(
                 elevation = glowElevation,
                 shape = CircleShape,
-                ambientColor = RadikoColors.PrimaryBlue.copy(alpha = 0.14f),
-                spotColor = RadikoColors.PrimaryBlue.copy(alpha = 0.14f),
+                ambientColor = palette.shadow,
+                spotColor = palette.shadow,
             )
             .background(
                 color = containerColor,
@@ -320,14 +278,14 @@ private fun CollapseButton(
         Canvas(modifier = Modifier.size(width = 20.dp, height = 12.dp)) {
             val strokeWidth = 3.8.dp.toPx()
             drawLine(
-                color = RadikoColors.PrimaryBlue,
+                color = palette.ink2,
                 start = Offset(0f, 1.dp.toPx()),
                 end = Offset(size.width / 2f, size.height),
                 strokeWidth = strokeWidth,
                 cap = StrokeCap.Round,
             )
             drawLine(
-                color = RadikoColors.PrimaryBlue,
+                color = palette.ink2,
                 start = Offset(size.width, 1.dp.toPx()),
                 end = Offset(size.width / 2f, size.height),
                 strokeWidth = strokeWidth,

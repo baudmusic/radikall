@@ -12,7 +12,7 @@ export default defineConfig({
                 short_name: "Radikall",
                 description: "A standalone-friendly web radio client for Radiko stations.",
                 theme_color: "#d0104c",
-                background_color: "#f7f4ed",
+                background_color: "#fffffb", // 胡粉
                 display: "standalone",
                 orientation: "portrait",
                 start_url: "/",

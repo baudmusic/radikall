@@ -28,7 +28,8 @@ import coil3.compose.AsyncImage
 import com.radiko.i18n.appStrings
 import com.radiko.station.OnAirSong
 import com.radiko.station.ProgramEntry
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
+import com.radiko.ui.theme.radikoPanelBorderColor
 import com.radiko.ui.theme.radikoPanelColor
 import com.radiko.ui.theme.radikoPrimaryTextColor
 import com.radiko.ui.theme.radikoSecondaryTextColor
@@ -49,7 +50,7 @@ fun CurrentOnAirSongCard(
             )
             .border(
                 width = 1.dp,
-                color = RadikoColors.PrimaryBlue.copy(alpha = 0.16f),
+                color = radikoPanelBorderColor(),
                 shape = RoundedCornerShape(24.dp),
             )
             .padding(24.dp),
@@ -123,7 +124,7 @@ fun OnAirSongsList(
                 text = strings.onAirHistoryTitle,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = RadikoColors.White,
+                color = radikoPalette().onStage,
             )
             Text(
                 text = when (historyMode) {
@@ -131,7 +132,7 @@ fun OnAirSongsList(
                     OnAirHistoryMode.FULL_STATION -> strings.recentStationSongsDescription
                 },
                 style = MaterialTheme.typography.titleSmall,
-                color = RadikoColors.White.copy(alpha = 0.82f),
+                color = radikoPalette().onStage2,
             )
         }
 
@@ -140,21 +141,11 @@ fun OnAirSongsList(
                 text = strings.currentProgramLabel,
                 selected = historyMode == OnAirHistoryMode.CURRENT_PROGRAM,
                 onClick = { onHistoryModeChange(OnAirHistoryMode.CURRENT_PROGRAM) },
-                selectedContainerColor = RadikoColors.White,
-                selectedContentColor = RadikoColors.NowPlayingBlue,
-                containerColor = RadikoColors.White.copy(alpha = 0.9f),
-                contentColor = RadikoColors.DarkText,
-                glowColor = RadikoColors.White,
             )
             GlowChip(
                 text = strings.fullStationLabel,
                 selected = historyMode == OnAirHistoryMode.FULL_STATION,
                 onClick = { onHistoryModeChange(OnAirHistoryMode.FULL_STATION) },
-                selectedContainerColor = RadikoColors.White,
-                selectedContentColor = RadikoColors.NowPlayingBlue,
-                containerColor = RadikoColors.White.copy(alpha = 0.9f),
-                contentColor = RadikoColors.DarkText,
-                glowColor = RadikoColors.White,
             )
         }
 
@@ -206,7 +197,7 @@ fun OnAirSongsList(
                         ) {
                             Text(
                                 text = if (showAll) strings.collapse else strings.showMore,
-                                color = RadikoColors.PrimaryBlue,
+                                color = radikoPalette().info,
                                 fontWeight = FontWeight.SemiBold,
                             )
                         }
@@ -223,12 +214,12 @@ private fun HistoricalSongCard(song: OnAirSong) {
         modifier = Modifier
             .width(360.dp)
             .background(
-                color = radikoPanelColor(),
+                color = radikoPalette().surfaceSunken,
                 shape = RoundedCornerShape(16.dp),
             )
             .border(
                 width = 1.dp,
-                color = RadikoColors.PrimaryBlue.copy(alpha = 0.12f),
+                color = radikoPalette().line,
                 shape = RoundedCornerShape(16.dp),
             )
             .padding(18.dp),
@@ -249,7 +240,7 @@ private fun SongCardContent(
     onLightSurface: Boolean,
     artworkSize: androidx.compose.ui.unit.Dp,
 ) {
-    val textColor = if (onLightSurface) radikoPrimaryTextColor() else RadikoColors.White
+    val textColor = if (onLightSurface) radikoPrimaryTextColor() else radikoPalette().onStage
     val secondaryColor = textColor.copy(alpha = 0.76f)
 
     Row(
@@ -305,7 +296,7 @@ private fun SongArtwork(
             modifier = Modifier
                 .size(artworkSize)
                 .clip(RoundedCornerShape(12.dp))
-                .background(RadikoColors.White),
+                .background(radikoPalette().surfaceSunken),
             contentScale = ContentScale.Fit,
         )
     } else {
@@ -313,7 +304,7 @@ private fun SongArtwork(
             modifier = Modifier
                 .size(artworkSize)
                 .clip(RoundedCornerShape(12.dp))
-                .background(RadikoColors.White.copy(alpha = 0.18f)),
+                .background(radikoPalette().surfaceSunken),
         )
     }
 }

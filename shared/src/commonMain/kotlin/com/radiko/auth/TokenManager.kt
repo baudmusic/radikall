@@ -43,8 +43,10 @@ class TokenManager(
         return getSession(candidateAreas.first())
     }
 
+    /** 丢掉这个地区的会话；同一个会话可能还以别的地区为键存了一份，一并丢掉。 */
     fun invalidate(areaId: String) {
-        sessions.remove(areaId)
+        val session = sessions.remove(areaId) ?: return
+        sessions.values.removeAll { it == session }
     }
 }
 

@@ -25,7 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.radiko.ui.components.TopBarActionButton
 import com.radiko.ui.components.drawSettingsIcon
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import org.jetbrains.compose.resources.painterResource
 import radiko_app.shared.generated.resources.Res
 import radiko_app.shared.generated.resources.logo1
@@ -54,7 +54,7 @@ fun DesktopTitleBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(RadikoColors.White)
+            .background(radikoPalette().page)
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = {

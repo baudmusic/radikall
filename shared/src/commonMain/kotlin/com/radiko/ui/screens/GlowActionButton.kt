@@ -26,7 +26,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 
 @Composable
 fun GlowActionButton(
@@ -36,7 +36,12 @@ fun GlowActionButton(
     enabled: Boolean = true,
     fillMaxWidth: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
+    /** true：韓紅花实心（面板里的主操作）；false：胡粉底、舞台蓝字（蓝色播放条上）。 */
+    accent: Boolean = false,
 ) {
+    val palette = radikoPalette()
+    val base = if (accent) palette.accent else palette.onStage
+    val label = if (accent) palette.onAccent else palette.stage
     val shape = RoundedCornerShape(999.dp)
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
@@ -57,22 +62,22 @@ fun GlowActionButton(
     )
     val borderColor by animateColorAsState(
         targetValue = when {
-            !enabled -> RadikoColors.White.copy(alpha = 0.08f)
-            highlighted -> RadikoColors.White.copy(alpha = 0.34f)
-            else -> RadikoColors.White.copy(alpha = 0.18f)
+            !enabled -> base.copy(alpha = 0.08f)
+            highlighted -> base.copy(alpha = 0.34f)
+            else -> base.copy(alpha = 0.18f)
         },
         label = "glow_action_button_border",
     )
     val containerColor by animateColorAsState(
         targetValue = when {
-            !enabled -> RadikoColors.White.copy(alpha = 0.7f)
-            pressed -> RadikoColors.White.copy(alpha = 0.92f)
-            else -> RadikoColors.White
+            !enabled -> base.copy(alpha = 0.7f)
+            pressed -> base.copy(alpha = 0.92f)
+            else -> base
         },
         label = "glow_action_button_container",
     )
     val textColor by animateColorAsState(
-        targetValue = if (enabled) RadikoColors.NowPlayingBlue else RadikoColors.NowPlayingBlue.copy(alpha = 0.62f),
+        targetValue = if (enabled) label else label.copy(alpha = 0.62f),
         label = "glow_action_button_text",
     )
 
@@ -85,8 +90,8 @@ fun GlowActionButton(
             .shadow(
                 elevation = glowElevation,
                 shape = shape,
-                ambientColor = RadikoColors.White.copy(alpha = 0.38f),
-                spotColor = RadikoColors.White.copy(alpha = 0.38f),
+                ambientColor = base.copy(alpha = 0.38f),
+                spotColor = base.copy(alpha = 0.38f),
             )
             .then(if (fillMaxWidth) Modifier.fillMaxWidth() else Modifier)
             .hoverable(interactionSource = interactionSource)

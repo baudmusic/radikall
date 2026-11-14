@@ -35,14 +35,15 @@ import javax.swing.JPanel
 import javax.swing.JTextArea
 import javax.swing.JWindow
 
-private val TrayAccentBlue = Color(0x00, 0x5C, 0xAF)
-private val TrayAccentBlueDark = Color(0x11, 0x32, 0x85)
-private val TrayAccentRed = Color(0xD0, 0x10, 0x4C)
-private val TrayPanelBackground = Color(0xEA, 0xF3, 0xF7)
-private val TrayPanelBackgroundAlt = Color(0xF7, 0xFB, 0xFC)
-private val TrayPanelBorder = Color(0xC7, 0xDD, 0xE8)
-private val TrayTextPrimary = Color(0x2C, 0x2C, 0x2A)
-private val TrayTextSecondary = Color(0x6B, 0x69, 0x66)
+// 托盘菜单是 Swing 自绘的，不跟随应用主题，固定用 RadikoPalettes.Light 的颜色（日本の伝統色）。
+private val TrayAccentBlue = Color(0x00, 0x5C, 0xAF) // 瑠璃
+private val TrayAccentRed = Color(0xD0, 0x10, 0x4C) // 韓紅花
+private val TrayOnAccent = Color(0xFF, 0xFF, 0xFB) // 胡粉
+private val TrayPanelBackground = Color(0xFF, 0xFF, 0xFB) // 胡粉
+private val TrayPanelBackgroundAlt = Color(0xF2, 0xF7, 0xF7) // 瑠璃 5% 叠在胡粉上
+private val TrayPanelBorder = Color(0xB3, 0xCE, 0xE4) // 瑠璃 30% 叠在胡粉上
+private val TrayTextPrimary = Color(0x1C, 0x1C, 0x1C) // 墨
+private val TrayTextSecondary = Color(0x65, 0x67, 0x65) // 鈍
 
 class DesktopTrayController(
     private val onRestoreWindow: () -> Unit,
@@ -377,9 +378,9 @@ class DesktopTrayController(
     ): JButton {
         return RoundedButton(
             backgroundColor = if (primary) TrayAccentBlue else TrayPanelBackgroundAlt,
-            backgroundColorEnd = if (primary) TrayAccentBlueDark else TrayPanelBackgroundAlt,
+            backgroundColorEnd = if (primary) TrayAccentBlue else TrayPanelBackgroundAlt,
             borderColor = if (primary) TrayAccentBlue else TrayPanelBorder,
-            textColor = if (primary) Color.WHITE else TrayAccentBlue,
+            textColor = if (primary) TrayOnAccent else TrayAccentBlue,
         ).apply {
             this.text = text
             // preferredSize 宽度设 0，让 BoxLayout 平均分配可用宽度

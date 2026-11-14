@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 
 @Composable
 fun GlowChip(
@@ -35,11 +35,11 @@ fun GlowChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     minWidth: Dp = 0.dp,
-    selectedContainerColor: Color = RadikoColors.ScheduleHighlight,
-    selectedContentColor: Color = RadikoColors.White,
-    containerColor: Color = RadikoColors.White.copy(alpha = 0.94f),
-    contentColor: Color = RadikoColors.DarkText,
-    glowColor: Color = RadikoColors.NowPlayingBlue,
+    selectedContainerColor: Color = radikoPalette().accent,
+    selectedContentColor: Color = radikoPalette().onAccent,
+    containerColor: Color = radikoPalette().surfaceSunken,
+    contentColor: Color = radikoPalette().ink,
+    glowColor: Color = radikoPalette().accent,
 ) {
     val shape = RoundedCornerShape(16.dp)
     val interactionSource = remember { MutableInteractionSource() }
@@ -73,7 +73,7 @@ fun GlowChip(
         targetValue = when {
             selected -> selectedContainerColor.copy(alpha = 0.96f)
             hovered -> glowColor.copy(alpha = 0.6f)
-            else -> RadikoColors.White.copy(alpha = 0.22f)
+            else -> radikoPalette().line
         },
         label = "glow_chip_border",
     )

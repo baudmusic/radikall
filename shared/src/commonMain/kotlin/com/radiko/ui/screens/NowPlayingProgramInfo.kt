@@ -30,7 +30,7 @@ import coil3.compose.rememberAsyncImagePainter
 import com.radiko.i18n.AppStrings
 import com.radiko.i18n.appStrings
 import com.radiko.station.ProgramEntry
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import com.radiko.ui.theme.radikoPanelBorderColor
 import com.radiko.ui.theme.radikoPanelColor
 import com.radiko.ui.theme.radikoPrimaryTextColor
@@ -129,7 +129,7 @@ private fun ProgramHeroImage(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
-            .background(radikoPanelColor())
+            .background(radikoPalette().surfaceSunken)
             .border(
                 width = 1.dp,
                 color = radikoPanelBorderColor(),
@@ -201,6 +201,8 @@ private fun ProgramMetaPanel(
             },
             onClick = onTogglePlayback,
             enabled = !isLoading,
+            // 面板里的主操作：韓紅花实心，和「正在播」的红色语义一致。
+            accent = true,
             modifier = Modifier.fillMaxWidth(),
             fillMaxWidth = true,
             contentPadding = androidx.compose.foundation.layout.PaddingValues(

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,13 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.radiko.i18n.appStrings
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 import java.util.prefs.Preferences
 
 enum class DesktopCloseBehavior {
@@ -70,27 +70,21 @@ fun CloseToTrayPrompt(
     onCancel: () -> Unit,
 ) {
     val strings = appStrings()
+    val palette = radikoPalette()
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.28f)),
+            .background(palette.scrim),
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.44f)
                 .clip(RoundedCornerShape(30.dp))
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            RadikoColors.White,
-                            RadikoColors.ScheduleLightBlue,
-                        ),
-                    ),
-                )
+                .background(palette.surface)
                 .border(
                     width = 1.dp,
-                    color = RadikoColors.PrimaryBlue.copy(alpha = 0.16f),
+                    color = palette.line,
                     shape = RoundedCornerShape(30.dp),
                 )
                 .padding(horizontal = 28.dp, vertical = 24.dp),
@@ -104,7 +98,7 @@ fun CloseToTrayPrompt(
                         modifier = Modifier
                             .size(42.dp)
                             .background(
-                                color = RadikoColors.NowPlayingBlue.copy(alpha = 0.12f),
+                                color = palette.infoSoft,
                                 shape = CircleShape,
                             ),
                         contentAlignment = Alignment.Center,
@@ -112,7 +106,7 @@ fun CloseToTrayPrompt(
                         Text(
                             text = strings.trayIconLabel,
                             style = MaterialTheme.typography.labelLarge,
-                            color = RadikoColors.NowPlayingBlue,
+                            color = palette.info,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -121,13 +115,13 @@ fun CloseToTrayPrompt(
                         Text(
                             text = strings.minimizeToTrayPromptTitle,
                             style = MaterialTheme.typography.headlineSmall,
-                            color = RadikoColors.DarkText,
+                            color = palette.ink,
                             fontWeight = FontWeight.Bold,
                         )
                         Text(
                             text = strings.minimizeToTrayPromptBody,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = RadikoColors.DarkText.copy(alpha = 0.72f),
+                            color = palette.ink2,
                         )
                     }
                 }
@@ -136,7 +130,7 @@ fun CloseToTrayPrompt(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(18.dp))
-                        .background(RadikoColors.ScheduleLightBlue)
+                        .background(palette.surfaceSunken)
                         .clickable(onClick = { onRememberChoiceChange(!rememberChoice) })
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -144,11 +138,16 @@ fun CloseToTrayPrompt(
                     Checkbox(
                         checked = rememberChoice,
                         onCheckedChange = onRememberChoiceChange,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = palette.accent,
+                            checkmarkColor = palette.onAccent,
+                            uncheckedColor = palette.ink3,
+                        ),
                     )
                     Text(
                         text = strings.doNotShowAgain,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = RadikoColors.DarkText,
+                        color = palette.ink,
                     )
                 }
 
@@ -196,6 +195,7 @@ private fun PromptActionButton(
     val interactionSource = remember { MutableInteractionSource() }
     val hovered by interactionSource.collectIsHoveredAsState()
     val pressed by interactionSource.collectIsPressedAsState()
+    val palette = radikoPalette()
 
     val scale by animateFloatAsState(
         targetValue = when {
@@ -208,19 +208,16 @@ private fun PromptActionButton(
     val containerColor by animateColorAsState(
         targetValue = when (emphasis) {
             PromptActionEmphasis.Primary -> when {
-                pressed -> RadikoColors.PrimaryBlue.copy(alpha = 0.9f)
-                hovered -> RadikoColors.PrimaryBlue
-                else -> RadikoColors.NowPlayingBlue
+                pressed -> palette.stage.copy(alpha = 0.9f)
+                else -> palette.stage
             }
             PromptActionEmphasis.Secondary -> when {
-                pressed -> RadikoColors.ScheduleLightBlue.copy(alpha = 0.92f)
-                hovered -> RadikoColors.ScheduleLightBlue.copy(alpha = 0.98f)
-                else -> RadikoColors.White
+                pressed || hovered -> palette.surfaceSunken
+                else -> palette.surface
             }
             PromptActionEmphasis.Ghost -> when {
-                pressed -> Color(0xFFEFEFEF)
-                hovered -> Color(0xFFF5F5F5)
-                else -> Color(0x00FFFFFF)
+                pressed || hovered -> palette.surfaceSunken
+                else -> Color.Transparent
             }
         },
         label = "prompt_action_container",
@@ -228,16 +225,16 @@ private fun PromptActionButton(
     val borderColor by animateColorAsState(
         targetValue = when (emphasis) {
             PromptActionEmphasis.Primary -> Color.Transparent
-            PromptActionEmphasis.Secondary -> RadikoColors.PrimaryBlue.copy(alpha = 0.18f)
-            PromptActionEmphasis.Ghost -> if (hovered) Color(0xFFDADADA) else Color.Transparent
+            PromptActionEmphasis.Secondary -> palette.lineStrong
+            PromptActionEmphasis.Ghost -> if (hovered) palette.line else Color.Transparent
         },
         label = "prompt_action_border",
     )
     val textColor by animateColorAsState(
         targetValue = when (emphasis) {
-            PromptActionEmphasis.Primary -> Color.White
-            PromptActionEmphasis.Secondary -> RadikoColors.PrimaryBlue
-            PromptActionEmphasis.Ghost -> RadikoColors.DarkText.copy(alpha = 0.78f)
+            PromptActionEmphasis.Primary -> palette.onStage
+            PromptActionEmphasis.Secondary -> palette.info
+            PromptActionEmphasis.Ghost -> palette.ink2
         },
         label = "prompt_action_text",
     )

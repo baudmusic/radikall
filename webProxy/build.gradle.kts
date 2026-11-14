@@ -4,8 +4,14 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
+// 不锁定 JDK 版本（以前的 jvmToolchain(17) 要求本机装着 JDK 17，换了 JDK 21 的 Android Studio 后同步直接失败），
+// 和其他模块一样只把编译目标定在 Java 17：用 JDK 17、21、24 都能构建。
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 kotlin {
-    jvmToolchain(17)
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }

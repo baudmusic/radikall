@@ -42,8 +42,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.radiko.i18n.appStrings
 import com.radiko.platform.PlatformEnvironment
+import com.radiko.station.ALL_AREAS_ID
 import com.radiko.station.PrefectureData
-import com.radiko.ui.theme.RadikoColors
+import com.radiko.ui.theme.radikoPalette
 
 private val AreaSelectorHorizontalPadding = 18.dp
 private val AreaSelectorVerticalPadding = 10.dp
@@ -58,9 +59,11 @@ fun AreaSelector(
     currentAreaId: String,
     onAreaSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
+    /** 在菜单顶部提供「全国」（[ALL_AREAS_ID]）。只用于浏览，设置里选固定地区时不提供。 */
+    includeAllAreas: Boolean = false,
 ) {
     val strings = appStrings()
-    val currentPrefecture = PrefectureData.prefecture(currentAreaId)
+    val palette = radikoPalette()
     var expanded by remember { mutableStateOf(false) }
     val pillShape = RoundedCornerShape(999.dp)
     val interactionSource = remember { MutableInteractionSource() }
@@ -72,15 +75,15 @@ fun AreaSelector(
         label = "area_selector_scale",
     )
     val containerColor by animateColorAsState(
-        targetValue = if (isHovered) RadikoColors.AccentRed else Color.White,
+        targetValue = if (isHovered) palette.surface else palette.accent,
         label = "area_selector_container",
     )
     val borderColor by animateColorAsState(
-        targetValue = RadikoColors.AccentRed,
+        targetValue = palette.accent,
         label = "area_selector_border",
     )
     val contentColor by animateColorAsState(
-        targetValue = if (isHovered) Color.White else RadikoColors.AccentRed,
+        targetValue = if (isHovered) palette.accent else palette.onAccent,
         label = "area_selector_content",
     )
     val hoverModifier = if (PlatformEnvironment.supportsPointerHover) {
@@ -111,7 +114,7 @@ fun AreaSelector(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = strings.prefectureName(currentAreaId, currentPrefecture?.name ?: currentAreaId),
+                    text = strings.areaLabel(currentAreaId),
                     style = MaterialTheme.typography.labelLarge,
                     color = contentColor,
                     fontWeight = FontWeight.Medium,
@@ -147,42 +150,62 @@ fun AreaSelector(
             onDismissRequest = { expanded = false },
             modifier = Modifier.heightIn(max = AreaSelectorMenuMaxHeight),
             shape = RoundedCornerShape(20.dp),
-            containerColor = RadikoColors.AccentRed,
-            shadowElevation = 0.dp,
-            border = androidx.compose.foundation.BorderStroke(1.dp, RadikoColors.AccentRed),
+            containerColor = palette.surface,
+            shadowElevation = 8.dp,
+            border = androidx.compose.foundation.BorderStroke(1.dp, palette.line),
         ) {
             Column(
                 modifier = Modifier
                     .heightIn(max = AreaSelectorMenuMaxHeight)
-                    .background(color = RadikoColors.AccentRed)
+                    .background(color = palette.surface)
                     .verticalScroll(rememberScrollState()),
             ) {
+                if (includeAllAreas) {
+                    DropdownMenuItem(
+                        modifier = Modifier.background(
+                            color = if (currentAreaId == ALL_AREAS_ID) palette.accent else Color.Transparent,
+                            shape = RoundedCornerShape(16.dp),
+                        ),
+                        text = {
+                            Text(
+                                text = strings.allAreas,
+                                color = if (currentAreaId == ALL_AREAS_ID) palette.onAccent else palette.ink,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        },
+                        onClick = {
+                            expanded = false
+                            onAreaSelected(ALL_AREAS_ID)
+                        },
+                        colors = MenuDefaults.itemColors(
+                            textColor = palette.ink,
+                        ),
+                    )
+                    HorizontalDivider(color = palette.line)
+                }
                 PrefectureData.regions.forEachIndexed { index, region ->
                     if (index > 0) {
-                        HorizontalDivider(color = Color.White.copy(alpha = 0.18f))
+                        HorizontalDivider(color = palette.line)
                     }
                     DropdownMenuItem(
                         text = {
                             Text(
                                 text = strings.regionName(region.id, region.name),
                                 style = MaterialTheme.typography.labelMedium,
-                                color = Color.White.copy(alpha = 0.74f),
+                                color = palette.accent,
+                                fontWeight = FontWeight.Bold,
                             )
                         },
                         onClick = {},
                         enabled = false,
                         colors = MenuDefaults.itemColors(
-                            disabledTextColor = Color.White.copy(alpha = 0.74f),
+                            disabledTextColor = palette.accent,
                         ),
                     )
                     PrefectureData.prefecturesForRegion(region.id).forEach { prefecture ->
                         DropdownMenuItem(
                             modifier = Modifier.background(
-                                color = if (prefecture.id == currentAreaId) {
-                                    Color.White.copy(alpha = 0.14f)
-                                } else {
-                                    Color.Transparent
-                                },
+                                color = if (prefecture.id == currentAreaId) palette.accent else Color.Transparent,
                                 shape = RoundedCornerShape(16.dp),
                             ),
                             text = {
@@ -193,7 +216,7 @@ fun AreaSelector(
                                 ) {
                                     Text(
                                         text = strings.prefectureName(prefecture.id, prefecture.name),
-                                        color = Color.White,
+                                        color = if (prefecture.id == currentAreaId) palette.onAccent else palette.ink,
                                     )
                                 }
                             },
@@ -202,7 +225,7 @@ fun AreaSelector(
                                 onAreaSelected(prefecture.id)
                             },
                             colors = MenuDefaults.itemColors(
-                                textColor = Color.White,
+                                textColor = palette.ink,
                             ),
                         )
                     }
